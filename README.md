@@ -31,6 +31,7 @@ Aplikasi web berbasis **Single Page Dashboard** untuk memprediksi suhu maksimum 
 - **Rekomendasi Kesehatan Warga (`F-UI-10`):** Saran mitigasi praktis yang menyesuaikan 5 tingkat status termal.
 - **Grafik Faktor Penentu (`F-UI-11`):** Visualisasi bobot *feature importance* aktual dari `rf_model.joblib` beserta nilai input aktif pengguna.
 - **Riwayat Prediksi Sesi (`F-UI-12`):** Menyimpan 5 prediksi terakhir di browser (`localStorage`) lengkap dengan tombol muat ulang input.
+- **Pengalaman Tambahan FE:** **Compact Intro Strip**, **UAS Footer**, **Favicon SVG**, **Toggle Dark Mode** (terkalibrasi WCAG AA, tersimpan di `localStorage`), dan **Toggle Bahasa ID / EN** penuh.
 
 ---
 
@@ -43,21 +44,25 @@ PrediksiSuhu/
 ├── .gitignore                      # Abaikan node_modules/, dist/, .env, .venv/, __pycache__/
 ├── PRD.md                          # Spesifikasi fitur & produk
 ├── API_CONTRACT.md                 # Kontrak REST API FE <-> BE & tipe TypeScript
-├── design.md                       # Sistem desain UI, skala termal 5-level & responsivitas
+├── design.md                       # Sistem desain UI, skala termal 5-level, Dark Mode & responsivitas
 ├── plan.md                         # Rencana implementasi bertahap Frontend
 ├── README.md                       # Panduan umum monorepo
 ├── rf_model.joblib                 # Model Random Forest terlatih (~49.5 MB)
 │
-├── frontend/                       # Target aplikasi FE (React + Vite + Tailwind + TypeScript)
+├── frontend/                       # Aplikasi FE aktif (React + Vite + Tailwind + TypeScript)
 │   ├── .env.example
+│   ├── index.html
 │   ├── package.json
+│   ├── public/
+│   │   └── favicon.svg             # Favicon termometer terkalibrasi
 │   └── src/
 │       ├── types/                  # Kontrak TypeScript (prediction.ts)
-│       ├── data/                   # Metadata model, fitur, preset, & 25 stasiun
-│       ├── utils/                  # Skala termal, validasi 21 fitur, parser CSV
+│       ├── i18n/                   # Kamus terjemahan ID / EN (translations.ts)
+│       ├── data/                   # Metadata model, fitur, preset, & 25 stasiun asli
+│       ├── utils/                  # Skala termal, saran kesehatan, validasi 21 fitur, parser CSV
 │       ├── services/               # httpClient, mockPredictor, & predictionService switcher
-│       ├── hooks/                  # usePrediction & useSessionHistory
-│       └── components/             # Komponen layout, input (F-UI-01..05), & output (F-UI-06..12)
+│       ├── hooks/                  # usePrediction, useSessionHistory, useTheme, useLanguage
+│       └── components/             # Layout (Header, Intro, Footer, Switcher), input (F-UI-01..05), output (F-UI-06..12)
 │
 └── backend/                        # Server BE Flask + data asli dataset UTS
     ├── requirements.txt
@@ -92,7 +97,7 @@ PrediksiSuhu/
 
 ## Panduan Menjalankan Proyek
 
-### 1. Frontend (`frontend/`, setelah Fase 1 selesai diinisialisasi)
+### 1. Frontend (`frontend/`, sudah siap dijalankan)
 
 ```bash
 cd frontend
@@ -103,7 +108,11 @@ npm run dev
 
 Konfigurasi `.env` frontend:
 - **Mode Simulasi FE (tanpa backend):** set `VITE_USE_MOCK=true`. Seluruh alur UI berjalan dengan simulator lokal.
-- **Mode Live API (terhubung ke backend):** set `VITE_USE_MOCK=false` dan arahkan `VITE_API_BASE_URL=http://localhost:8000` (atau port server Flask/FastAPI tim BE).
+- **Mode Live API (terhubung ke backend):** set `VITE_USE_MOCK=false` dan arahkan `VITE_API_BASE_URL=http://localhost:8000` (atau URL server backend produksi).
+
+**Deploy Frontend ke Vercel (Mode Simulasi FE):**
+- **Root Directory:** `frontend` | **Framework Preset:** `Vite` | **Build Command:** `npm run build` | **Output Directory:** `dist`
+- **Environment Variable:** `VITE_USE_MOCK=true` (ubah ke `false` dan tambah `VITE_API_BASE_URL` setelah backend live tersedia).
 
 ### 2. Backend (`backend/`, sudah siap dijalankan)
 

@@ -28,25 +28,29 @@ Pengembangan berfokus penuh pada sisi **Frontend (FE)** di dalam direktori terpi
 ```text
 frontend/
 ├── .env.example
-├── index.html                      # Memuat Source Sans 3 & metadata judul dashboard
+├── index.html                      # Memuat Source Sans 3, favicon.svg, dan script anti-flash tema
 ├── package.json
+├── public/
+│   └── favicon.svg                 # Favicon termometer Cobalt vektor
 ├── tsconfig.json
 ├── vite.config.ts
 └── src/
     ├── main.tsx
     ├── App.tsx                     # Layout shell 3-breakpoint & state orkestrasi utama
-    ├── index.css                   # Design tokens, base typography, tabular-nums, focus ring
+    ├── index.css                   # Design tokens Light & Dark, base typography, tabular-nums, focus ring
     ├── types/
     │   └── prediction.ts           # Kontrak tipe persis dari API_CONTRACT.md
+    ├── i18n/
+    │   └── translations.ts         # Kamus dwibahasa lengkap ID / EN
     ├── data/
     │   ├── featureMeta.ts          # Metadata 21 fitur (urutan, tab, satuan, rentang split model)
     │   ├── modelMeta.ts            # Metrik evaluasi & global feature importances aktual rf_model.joblib
     │   ├── presets.ts              # 3 skenario nyata (dari backend/data/presets.json / API)
     │   └── stations.ts             # Data 25 stasiun asli (dari backend/data/stations.json / API)
     ├── utils/
-    │   ├── thermalScale.ts         # Fungsi tunggal klasifikasi 5-level & warna semantik
-    │   ├── healthAdvisory.ts       # Pemetaan rekomendasi mitigasi kesehatan per thermal level
-    │   ├── validation.ts           # Validasi 21 field angka + deteksi min/max & error per tab
+    │   ├── thermalScale.ts         # Fungsi tunggal klasifikasi 5-level & warna semantik (ID/EN)
+    │   ├── healthAdvisory.ts       # Pemetaan rekomendasi mitigasi kesehatan per thermal level (ID/EN)
+    │   ├── validation.ts           # Validasi 21 field angka + deteksi min/max & error per tab (ID/EN)
     │   └── csvParser.ts            # Generate template CSV, validasi header 21 kolom, ekspor hasil CSV
     ├── services/
     │   ├── httpClient.ts           # Fetch wrapper dengan timeout & parsing ApiErrorResponse
@@ -54,10 +58,14 @@ frontend/
     │   └── predictionService.ts    # Switcher otomatis mock vs live HTTP (VITE_USE_MOCK)
     ├── hooks/
     │   ├── usePrediction.ts        # State loading, error, hasil single & batch prediction
-    │   └── useSessionHistory.ts    # Persistensi 5 riwayat terakhir di localStorage
+    │   ├── useSessionHistory.ts    # Persistensi 5 riwayat terakhir di localStorage
+    │   ├── useTheme.ts             # Persistensi Light / Dark Mode di localStorage
+    │   └── useLanguage.ts          # Persistensi bahasa ID / EN di localStorage & html[lang]
     └── components/
         ├── layout/
-        │   ├── DashboardHeader.tsx # Judul & badge status koneksi (Mode Simulasi / API Terhubung)
+        │   ├── DashboardHeader.tsx # Judul, toggle ID/EN, toggle Dark/Light, switcher API/Simulasi, badge koneksi
+        │   ├── DashboardIntro.tsx  # Strip intro ringkas dengan 3 metrik nyata UTS
+        │   ├── DashboardFooter.tsx # Footer identitas proyek UAS & link repositori GitHub
         │   └── ModeSwitcher.tsx    # Switch mode kerja: Prediksi Tunggal | Batch CSV
         ├── input/
         │   ├── StationSelector.tsx # F-UI-01 Dropdown 25 stasiun + info auto-fill 4 field geografis
@@ -140,17 +148,18 @@ frontend/
 
 ---
 
-### Fase 5: Verifikasi Responsif, Aksesibilitas, dan Quality Gate
+### Fase 5 & Penyempurnaan Pasca-Audit (Selesai Terverifikasi)
 
 **Tujuan:** Memastikan seluruh UI memenuhi aturan `antislop` (DURING, UI, Layoutmobile) dan `impeccable` sebelum dipakai untuk integrasi BE maupun demo.
 
-1. **Verifikasi Build & Runtime:** Jalankan `npm run build` dan preview aplikasi di browser tanpa console error.
-2. **Uji Responsivitas 3 Breakpoint (`R-03`):**
-   - Uji lebar `360px - 390px` (Compact): pastikan nol *horizontal scroll*, semua tombol/tab memiliki target sentuh `>= 44px`, dan sticky bottom bar tidak menutupi konten terakhir.
-   - Uji lebar `768px - 900px` (Medium): pastikan grid 2 kolom di dalam form dan hasil bekerja seimbang tanpa ruang kosong berlebih.
-   - Uji lebar `1280px - 1440px` (Wide): pastikan 2 kolom `46% / 54%` tetap proporsional dan tabel tidak meluap.
-3. **Uji Aksesibilitas Keyboard & Kontras (`R-25`, `R-32`):** Uji navigasi penuh dengan `Tab`, `Shift+Tab`, `ArrowLeft`/`ArrowRight`, `Enter`, dan `Space`, serta periksa *focus ring* pada seluruh kontrol.
-4. **Click-Through Audit & Detector (`R-35`):** Jalankan pemeriksaan seluruh elemen interaktif satu per satu (dropdown stasiun, 3 preset, 3 tab, submit valid/invalid, upload CSV valid/invalid, unduh template/hasil, muat ulang riwayat) serta jalankan `impeccable detect --json` terhadap kode `frontend/src/`.
+1. **Verifikasi Build & Runtime (Selesai):** `npm run build` (`tsc -b && vite build`) lolos tanpa error TypeScript dan aplikasi berjalan bersih di browser tanpa console error.
+2. **Uji Responsivitas 3 Breakpoint (`R-03`, Selesai):**
+   - Lebar `375x812` (Compact): nol *horizontal scroll*, seluruh tombol/tab termasuk kontrol header memenuhi target sentuh `>= 44px`, dan sticky bottom bar tidak menutupi footer maupun riwayat terakhir.
+   - Lebar `768x1024` (Medium): grid 2 kolom di dalam form dan hasil bekerja seimbang tanpa clipping.
+   - Lebar `1280x800` (Wide): 2 kolom `46fr / 54fr` proporsional dengan `DashboardIntro` dan kedua panel utama terlihat di atas lipatan layar.
+3. **Uji Aksesibilitas Keyboard & Kontras (`R-25`, `R-32`, Selesai):** Navigasi penuh dengan `Tab`, `Shift+Tab`, `ArrowLeft`/`ArrowRight`, `Enter`, dan `Space`, *focus ring* jelas, serta kedua tema Light & Dark lolos WCAG AA (`>= 5.71:1`).
+4. **Click-Through Audit & Detector (`R-35`, Selesai):** Seluruh elemen interaktif lolos uji langsung di browser dan `impeccable detect --json frontend/src` mengembalikan `0` temuan (`[]`).
+5. **Penambahan Pasca-Fase 5 (Selesai):** `DashboardIntro`, `DashboardFooter`, `public/favicon.svg`, toggle **Dark Mode** (`useTheme.ts`), dan dukungan dwibahasa **ID / EN** penuh (`useLanguage.ts` & `src/i18n/translations.ts`).
 
 ---
 
