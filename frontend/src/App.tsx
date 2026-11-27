@@ -6,7 +6,9 @@ import { PredictActionBar } from './components/input/PredictActionBar';
 import { ScenarioPresets } from './components/input/ScenarioPresets';
 import { StationSelector } from './components/input/StationSelector';
 import { WeatherInputTabs } from './components/input/WeatherInputTabs';
+import { DashboardFooter } from './components/layout/DashboardFooter';
 import { DashboardHeader } from './components/layout/DashboardHeader';
+import { DashboardIntro } from './components/layout/DashboardIntro';
 import { ModeSwitcher, type WorkspaceMode } from './components/layout/ModeSwitcher';
 import { DeltaIndicator } from './components/output/DeltaIndicator';
 import { FeatureImportanceChart } from './components/output/FeatureImportanceChart';
@@ -194,7 +196,7 @@ export default function App() {
       : modelInfo.feature_importances;
 
   return (
-    <div className="min-h-dvh bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
+    <div className="flex min-h-dvh flex-col bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
       <DashboardHeader
         serviceMode={serviceMode}
         onChangeServiceMode={setServiceMode}
@@ -203,17 +205,11 @@ export default function App() {
         onRefreshHealth={() => void refreshHealth(serviceMode)}
       />
 
-      <main
-        className={`mx-auto max-w-[1360px] space-y-5 px-4 pt-5 min-[720px]:px-6 min-[720px]:py-6 ${
-          workspaceMode === 'single' ? 'pb-28' : 'pb-8'
-        }`}
-      >
+      <main className="mx-auto w-full max-w-[1360px] flex-1 space-y-5 px-4 py-5 min-[720px]:px-6 min-[720px]:py-6">
+        <DashboardIntro stationCount={stations.length} modelInfo={modelInfo} />
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <ModeSwitcher mode={workspaceMode} onChangeMode={setWorkspaceMode} />
-          <p className="text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
-            Model {modelInfo.algorithm} ({modelInfo.n_estimators} trees) | R2{' '}
-            {(modelInfo.metrics.r2 * 100).toFixed(2)}% | MAE {modelInfo.metrics.mae.toFixed(4)} °C
-          </p>
         </div>
 
         {workspaceMode === 'batch' ? (
@@ -326,6 +322,8 @@ export default function App() {
           </div>
         )}
       </main>
+
+      <DashboardFooter isSingleMode={workspaceMode === 'single'} />
     </div>
   );
 }
