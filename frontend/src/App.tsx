@@ -7,11 +7,15 @@ import { StationSelector } from './components/input/StationSelector';
 import { WeatherInputTabs } from './components/input/WeatherInputTabs';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { ModeSwitcher, type WorkspaceMode } from './components/layout/ModeSwitcher';
+import { DeltaIndicator } from './components/output/DeltaIndicator';
+import { FeatureImportanceChart } from './components/output/FeatureImportanceChart';
+import { HealthAdvisory } from './components/output/HealthAdvisory';
 import { HeatwaveBanner } from './components/output/HeatwaveBanner';
 import { HeroPredictionCard } from './components/output/HeroPredictionCard';
 import { ResultEmptyState } from './components/output/ResultEmptyState';
 import { ResultErrorState } from './components/output/ResultErrorState';
 import { ResultSkeleton } from './components/output/ResultSkeleton';
+import { ThermalGauge } from './components/output/ThermalGauge';
 import { usePrediction } from './hooks/usePrediction';
 import {
   MODEL_FEATURE_ORDER,
@@ -19,6 +23,7 @@ import {
   type InputTabId,
   type ScenarioPreset,
   type StationPreset,
+  type WeatherFeatures,
 } from './types/prediction';
 import {
   featuresToDraft,
@@ -62,6 +67,9 @@ export default function App() {
   const [submittedValidation, setSubmittedValidation] = useState<boolean>(false);
   const [lastPredictedStationLabel, setLastPredictedStationLabel] = useState<string>(
     `Stasiun ${initialPreset.station_id}`
+  );
+  const [lastPredictedFeatures, setLastPredictedFeatures] = useState<WeatherFeatures>(
+    initialPreset.features
   );
 
   const validation = useMemo(() => validateFeatureDraft(draft), [draft]);
@@ -124,6 +132,7 @@ export default function App() {
       : stationText;
 
     setLastPredictedStationLabel(label);
+    setLastPredictedFeatures(validation.parsed);
     await runSinglePrediction({
       station_id: selectedStationId,
       features: validation.parsed,
@@ -140,6 +149,11 @@ export default function App() {
     setSubmittedValidation(false);
     clearResult();
   }
+
+  const activeFactors =
+    result?.top_factors && result.top_factors.length > 0
+      ? result.top_factors
+      : modelInfo.feature_importances;
 
   return (
     <div className="min-h-dvh bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
@@ -166,7 +180,7 @@ export default function App() {
               Mode Batch CSV (Disiapkan di Fase 4)
             </h2>
             <p className="mt-1.5 max-w-[68ch] text-[0.9375rem] text-[var(--ink-secondary)]">
-              Unggah berkas CSV multi-baris, unduh template 21 fitur model, dan ekspor hasil prediksi massal akan diaktifkan setelah Fase 2 dan Fase 3 disetujui.
+              Unggah berkas CSV multi-baris, unduh template 21 fitur model, dan ekspor hasil prediksi massal akan diaktifkan setelah Fase 3 disetujui.
             </p>
             <button
               type="button"
@@ -221,7 +235,7 @@ export default function App() {
               />
             </section>
 
-            {/* Kolom Kanan: Visualisasi & Hasil Prediksi (Fase 2: Hero + Banner + 3 States) */}
+            {/* Kolom Kanan: Visualisasi & Hasil Prediksi (Fase 3 lengkap) */}
             <section aria-label="Hasil prediksi" className="min-w-0 space-y-4">
               {loading ? (
                 <ResultSkeleton />
@@ -234,11 +248,32 @@ export default function App() {
                 />
               ) : result ? (
                 <>
-                  <HeroPredictionCard
-                    prediction={result}
-                    stationLabel={lastPredictedStationLabel}
-                  />
+                  <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
+                    <HeroPredictionCard
+                      prediction={result}
+                      stationLabel={lastPredictedStationLabel}
+                    />
+                    <ThermalGauge
+                      temperature={result.predicted_tmax}
+                      level={result.heatwave_status}
+                    />
+                  </div>
+
                   <HeatwaveBanner level={result.heatwave_status} />
+
+                  <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
+                    <DeltaIndicator
+                      presentTmax={result.present_tmax}
+                      predictedTmax={result.predicted_tmax}
+                      deltaT={result.delta_t}
+                    />
+                    <HealthAdvisory level={result.heatwave_status} />
+                  </div>
+
+                  <FeatureImportanceChart
+                    factors={activeFactors}
+                    inputFeatures={lastPredictedFeatures}
+                  />
                 </>
               ) : (
                 <ResultEmptyState />
