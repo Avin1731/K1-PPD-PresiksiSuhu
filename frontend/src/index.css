@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #f6f7f9;
+  --surface-primary: #ffffff;
+  --surface-secondary: #eef1f5;
+  --border-subtle: #d8dfe8;
+
+  --ink-primary: #0f172a;
+  --ink-secondary: #475569;
+  --ink-muted: #526071;
+
+  --accent-primary: #1e40af;
+  --accent-hover: #1e3a8a;
+  --accent-tint: #eff6ff;
+
+  --thermal-cool-ink: #075985;
+  --thermal-cool-bg: #e0f2fe;
+  --thermal-cool-border: #7dd3fc;
+  --thermal-cool-gauge: #0284c7;
+
+  --thermal-normal-ink: #166534;
+  --thermal-normal-bg: #dcfce7;
+  --thermal-normal-border: #86efac;
+  --thermal-normal-gauge: #16a34a;
+
+  --thermal-warm-ink: #92400e;
+  --thermal-warm-bg: #fef3c7;
+  --thermal-warm-border: #fcd34d;
+  --thermal-warm-gauge: #d97706;
+
+  --thermal-advisory-ink: #9a3412;
+  --thermal-advisory-bg: #ffedd5;
+  --thermal-advisory-border: #fdba74;
+  --thermal-advisory-gauge: #ea580c;
+
+  --thermal-warning-ink: #991b1b;
+  --thermal-warning-bg: #fee2e2;
+  --thermal-warning-border: #fca5a5;
+  --thermal-warning-gauge: #dc2626;
+}
+
+@layer base {
+  html {
+    font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    caret-color: var(--accent-primary);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #dbeafe;
+    color: #0f172a;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
