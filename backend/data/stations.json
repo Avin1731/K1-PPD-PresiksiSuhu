@@ -1,0 +1,202 @@
+[
+  {
+    "station_id": 1,
+    "district_name": "Stasiun 1",
+    "lat": 37.6046,
+    "lon": 126.991,
+    "DEM": 212.335,
+    "Slope": 2.785
+  },
+  {
+    "station_id": 2,
+    "district_name": "Stasiun 2",
+    "lat": 37.6046,
+    "lon": 127.032,
+    "DEM": 44.7624,
+    "Slope": 0.5141
+  },
+  {
+    "station_id": 3,
+    "district_name": "Stasiun 3",
+    "lat": 37.5776,
+    "lon": 127.058,
+    "DEM": 33.3068,
+    "Slope": 0.2661
+  },
+  {
+    "station_id": 4,
+    "district_name": "Stasiun 4",
+    "lat": 37.645,
+    "lon": 127.022,
+    "DEM": 45.716,
+    "Slope": 2.5348
+  },
+  {
+    "station_id": 5,
+    "district_name": "Stasiun 5",
+    "lat": 37.5507,
+    "lon": 127.135,
+    "DEM": 35.038,
+    "Slope": 0.5055
+  },
+  {
+    "station_id": 6,
+    "district_name": "Stasiun 6",
+    "lat": 37.5102,
+    "lon": 127.042,
+    "DEM": 54.6384,
+    "Slope": 0.1457
+  },
+  {
+    "station_id": 7,
+    "district_name": "Stasiun 7",
+    "lat": 37.5776,
+    "lon": 126.838,
+    "DEM": 12.37,
+    "Slope": 0.0985
+  },
+  {
+    "station_id": 8,
+    "district_name": "Stasiun 8",
+    "lat": 37.4697,
+    "lon": 126.91,
+    "DEM": 52.518,
+    "Slope": 1.5629
+  },
+  {
+    "station_id": 9,
+    "district_name": "Stasiun 9",
+    "lat": 37.4967,
+    "lon": 126.826,
+    "DEM": 50.9312,
+    "Slope": 0.4125
+  },
+  {
+    "station_id": 10,
+    "district_name": "Stasiun 10",
+    "lat": 37.4562,
+    "lon": 126.955,
+    "DEM": 208.507,
+    "Slope": 5.1782
+  },
+  {
+    "station_id": 11,
+    "district_name": "Stasiun 11",
+    "lat": 37.5372,
+    "lon": 127.085,
+    "DEM": 28.7,
+    "Slope": 0.6233
+  },
+  {
+    "station_id": 12,
+    "district_name": "Stasiun 12",
+    "lat": 37.5507,
+    "lon": 126.988,
+    "DEM": 132.118,
+    "Slope": 0.5931
+  },
+  {
+    "station_id": 13,
+    "district_name": "Stasiun 13",
+    "lat": 37.5776,
+    "lon": 127.083,
+    "DEM": 59.8324,
+    "Slope": 2.6865
+  },
+  {
+    "station_id": 14,
+    "district_name": "Stasiun 14",
+    "lat": 37.4967,
+    "lon": 126.927,
+    "DEM": 30.968,
+    "Slope": 0.618
+  },
+  {
+    "station_id": 15,
+    "district_name": "Stasiun 15",
+    "lat": 37.5507,
+    "lon": 126.937,
+    "DEM": 30.0464,
+    "Slope": 0.8552
+  },
+  {
+    "station_id": 16,
+    "district_name": "Stasiun 16",
+    "lat": 37.4697,
+    "lon": 126.995,
+    "DEM": 82.2912,
+    "Slope": 2.2579
+  },
+  {
+    "station_id": 17,
+    "district_name": "Stasiun 17",
+    "lat": 37.6181,
+    "lon": 127.099,
+    "DEM": 53.4712,
+    "Slope": 0.697
+  },
+  {
+    "station_id": 18,
+    "district_name": "Stasiun 18",
+    "lat": 37.4832,
+    "lon": 127.024,
+    "DEM": 56.4448,
+    "Slope": 1.2313
+  },
+  {
+    "station_id": 19,
+    "district_name": "Stasiun 19",
+    "lat": 37.5776,
+    "lon": 126.938,
+    "DEM": 75.0924,
+    "Slope": 1.7678
+  },
+  {
+    "station_id": 20,
+    "district_name": "Stasiun 20",
+    "lat": 37.6181,
+    "lon": 127.004,
+    "DEM": 146.554,
+    "Slope": 4.7296
+  },
+  {
+    "station_id": 21,
+    "district_name": "Stasiun 21",
+    "lat": 37.5507,
+    "lon": 127.04,
+    "DEM": 26.298,
+    "Slope": 0.5721
+  },
+  {
+    "station_id": 22,
+    "district_name": "Stasiun 22",
+    "lat": 37.5102,
+    "lon": 127.086,
+    "DEM": 21.9668,
+    "Slope": 0.1332
+  },
+  {
+    "station_id": 23,
+    "district_name": "Stasiun 23",
+    "lat": 37.5372,
+    "lon": 126.891,
+    "DEM": 15.5876,
+    "Slope": 0.1554
+  },
+  {
+    "station_id": 24,
+    "district_name": "Stasiun 24",
+    "lat": 37.5237,
+    "lon": 126.909,
+    "DEM": 17.2956,
+    "Slope": 0.2223
+  },
+  {
+    "station_id": 25,
+    "district_name": "Stasiun 25",
+    "lat": 37.5237,
+    "lon": 126.97,
+    "DEM": 19.5844,
+    "Slope": 0.2713
+  }
+]
