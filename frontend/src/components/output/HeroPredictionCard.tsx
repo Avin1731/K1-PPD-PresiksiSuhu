@@ -1,24 +1,32 @@
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { SinglePredictResponse } from '../../types/prediction';
 import { getThermalMeta } from '../../utils/thermalScale';
 
 interface HeroPredictionCardProps {
   prediction: SinglePredictResponse;
   stationLabel: string;
+  locale: Locale;
 }
 
-export function HeroPredictionCard({ prediction, stationLabel }: HeroPredictionCardProps) {
-  const meta = getThermalMeta(prediction.heatwave_status);
+export function HeroPredictionCard({
+  prediction,
+  stationLabel,
+  locale,
+}: HeroPredictionCardProps) {
+  const t = UI_STRINGS[locale];
+  const meta = getThermalMeta(prediction.heatwave_status, locale);
   const deltaSign = prediction.delta_t >= 0 ? '+' : '';
 
   return (
     <section
-      aria-label="Hasil prediksi suhu maksimum esok hari"
+      aria-label={t.heroTitle}
       className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5 min-[720px]:p-6"
       style={{ boxShadow: 'var(--shadow-hero)' }}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">
-          Prakiraan Suhu Maksimum Esok Hari (Next_Tmax)
+          {t.heroTitle}
         </p>
         <span
           style={{
@@ -39,23 +47,22 @@ export function HeroPredictionCard({ prediction, stationLabel }: HeroPredictionC
 
         <div className="text-left min-[720px]:text-right">
           <p className="text-[0.9375rem] font-semibold text-[var(--ink-primary)] tabular-nums">
-            Selisih {deltaSign}
-            {prediction.delta_t.toFixed(2)} °C vs hari ini
+            {t.heroDeltaPrefix} {deltaSign}
+            {prediction.delta_t.toFixed(2)} °C {t.heroDeltaVsToday}
           </p>
           <p className="text-[0.8125rem] text-[var(--ink-secondary)] tabular-nums">
-            Present_Tmax hari ini: {prediction.present_tmax.toFixed(1)} °C
+            {t.heroTodayPresent}: {prediction.present_tmax.toFixed(1)} °C
           </p>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-3 text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
-        <span>Lokasi: {stationLabel}</span>
         <span>
-          Sumber:{' '}
-          {prediction.is_mock
-            ? 'Estimasi Simulasi FE (menunggu API model)'
-            : 'API Live rf_model.joblib'}{' '}
-          | {prediction.inference_ms.toFixed(2)} ms
+          {t.heroLocation}: {stationLabel}
+        </span>
+        <span>
+          {t.heroSource}: {prediction.is_mock ? t.sourceMock : t.sourceLive} |{' '}
+          {prediction.inference_ms.toFixed(2)} ms
         </span>
       </div>
     </section>

@@ -1,4 +1,6 @@
 import { FEATURE_META_LIST, FEATURE_META_MAP } from '../data/featureMeta';
+import type { Locale } from '../hooks/useLanguage';
+import { FEATURE_EN_MAP, UI_STRINGS } from '../i18n/translations';
 import {
   MODEL_FEATURE_ORDER,
   type FeatureKey,
@@ -25,30 +27,35 @@ export function featuresToDraft(features: WeatherFeatures): FeatureFormDraft {
 }
 
 /** Validasi seluruh 21 input cuaca sebagai angka finite dan cek rentang split model. */
-export function validateFeatureDraft(draft: FeatureFormDraft): FeatureValidationResult {
+export function validateFeatureDraft(
+  draft: FeatureFormDraft,
+  locale: Locale = 'id'
+): FeatureValidationResult {
   const errors: FeatureValidationErrors = {};
   const warnings: FeatureValidationErrors = {};
   const parsed = {} as WeatherFeatures;
+  const str = UI_STRINGS[locale];
 
   for (const key of MODEL_FEATURE_ORDER) {
     const raw = (draft[key] ?? '').trim();
     const meta = FEATURE_META_MAP[key];
+    const label = locale === 'en' ? FEATURE_EN_MAP[key].label : meta.label;
 
     if (!raw) {
-      errors[key] = `${meta.label} wajib diisi.`;
+      errors[key] = str.validationRequired(label);
       continue;
     }
 
     const num = Number(raw);
     if (!Number.isFinite(num)) {
-      errors[key] = `${meta.label} harus berupa angka valid.`;
+      errors[key] = str.validationInvalidNumber(label);
       continue;
     }
 
     parsed[key] = num;
 
     if (num < meta.min || num > meta.max) {
-      warnings[key] = `Di luar kisaran latih model (${meta.min} - ${meta.max} ${meta.unit}).`;
+      warnings[key] = str.validationOutOfRange(meta.min, meta.max, meta.unit);
     }
   }
 
@@ -57,7 +64,7 @@ export function validateFeatureDraft(draft: FeatureFormDraft): FeatureValidation
     parsed.Present_Tmin !== undefined &&
     parsed.Present_Tmin > parsed.Present_Tmax
   ) {
-    errors.Present_Tmin = 'Suhu minimum hari ini tidak boleh melebihi suhu maksimum.';
+    errors.Present_Tmin = str.validationTminGtTmax;
   }
 
   const valid = Object.keys(errors).length === 0;

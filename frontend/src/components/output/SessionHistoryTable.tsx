@@ -1,4 +1,6 @@
 import { ArrowCounterClockwise, ClockCounterClockwise, Trash } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { SessionHistoryItem } from '../../types/prediction';
 import { getThermalMeta } from '../../utils/thermalScale';
 
@@ -6,13 +8,17 @@ interface SessionHistoryTableProps {
   history: SessionHistoryItem[];
   onLoadHistory: (item: SessionHistoryItem) => void;
   onClearHistory: () => void;
+  locale: Locale;
 }
 
 export function SessionHistoryTable({
   history,
   onLoadHistory,
   onClearHistory,
+  locale,
 }: SessionHistoryTableProps) {
+  const t = UI_STRINGS[locale];
+
   return (
     <section
       aria-labelledby="session-history-heading"
@@ -30,11 +36,9 @@ export function SessionHistoryTable({
               id="session-history-heading"
               className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]"
             >
-              Riwayat Prediksi Sesi (5 Terakhir)
+              {t.historyTitle}
             </h2>
-            <p className="text-[0.8125rem] text-[var(--ink-secondary)]">
-              Bandingkan beberapa skenario percobaan atau muat ulang parameternya ke formulir.
-            </p>
+            <p className="text-[0.8125rem] text-[var(--ink-secondary)]">{t.historySubtitle}</p>
           </div>
         </div>
 
@@ -45,7 +49,7 @@ export function SessionHistoryTable({
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3.5 text-[0.8125rem] font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-secondary)]"
           >
             <Trash size={16} aria-hidden="true" />
-            Hapus Riwayat
+            {t.historyClear}
           </button>
         )}
       </div>
@@ -53,10 +57,10 @@ export function SessionHistoryTable({
       {history.length === 0 ? (
         <div className="mt-4 rounded-[8px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-5 text-center">
           <p className="text-[0.9375rem] font-semibold text-[var(--ink-primary)]">
-            Belum ada riwayat prediksi pada sesi ini
+            {t.historyEmptyTitle}
           </p>
           <p className="mt-1 text-[0.8125rem] text-[var(--ink-secondary)]">
-            Jalankan prediksi pertama di formulir atas untuk mencatat dan membandingkan hasilnya di sini.
+            {t.historyEmptyBody}
           </p>
         </div>
       ) : (
@@ -66,19 +70,29 @@ export function SessionHistoryTable({
             <table className="w-full border-collapse text-left text-[0.875rem]">
               <thead>
                 <tr className="border-b border-[var(--border-subtle)] text-[0.8125rem] font-semibold text-[var(--ink-secondary)]">
-                  <th className="py-2.5 pr-3">Status</th>
-                  <th className="py-2.5 pr-3">Stasiun</th>
+                  <th className="py-2.5 pr-3">{t.historyColStatus}</th>
+                  <th className="py-2.5 pr-3">{t.historyColStation}</th>
                   <th className="py-2.5 pr-3 text-right">Next_Tmax</th>
                   <th className="py-2.5 pr-3 text-right">Present_Tmax</th>
                   <th className="py-2.5 pr-3 text-right">Delta T</th>
-                  <th className="py-2.5 pr-3">Waktu &amp; Sumber</th>
-                  <th className="py-2.5 text-right">Aksi</th>
+                  <th className="py-2.5 pr-3">{t.historyColTimeSource}</th>
+                  <th className="py-2.5 text-right">{t.historyColAction}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-subtle)]">
                 {history.map((item) => {
-                  const meta = getThermalMeta(item.heatwave_status);
+                  const meta = getThermalMeta(item.heatwave_status, locale);
                   const sign = item.delta_t >= 0 ? '+' : '';
+                  const stationDisplay =
+                    item.station_id !== null
+                      ? `${t.stationPrefix} ${item.station_id}${
+                          item.station_label.includes('disesuaikan') ||
+                          item.station_label.includes('adjusted')
+                            ? ` ${t.stationManualSuffix}`
+                            : ''
+                        }`
+                      : item.station_label;
+
                   return (
                     <tr key={item.id}>
                       <td className="py-2.5 pr-3">
@@ -94,7 +108,7 @@ export function SessionHistoryTable({
                         </span>
                       </td>
                       <td className="py-2.5 pr-3 font-medium text-[var(--ink-primary)]">
-                        {item.station_label}
+                        {stationDisplay}
                       </td>
                       <td className="py-2.5 pr-3 text-right font-bold tabular-nums">
                         {item.predicted_tmax.toFixed(2)} °C
@@ -107,7 +121,7 @@ export function SessionHistoryTable({
                         {item.delta_t.toFixed(2)} °C
                       </td>
                       <td className="py-2.5 pr-3 text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
-                        {item.timestamp} | {item.is_mock ? 'Simulasi FE' : 'API Live'}
+                        {item.timestamp} | {item.is_mock ? t.historySourceMock : t.historySourceLive}
                       </td>
                       <td className="py-2.5 text-right">
                         <button
@@ -116,7 +130,7 @@ export function SessionHistoryTable({
                           className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--accent-tint)]"
                         >
                           <ArrowCounterClockwise size={15} aria-hidden="true" />
-                          Muat Ulang Input
+                          {t.historyReload}
                         </button>
                       </td>
                     </tr>
@@ -129,8 +143,18 @@ export function SessionHistoryTable({
           {/* Mobile Stacked Row Cards (< 720px) */}
           <div className="mt-4 space-y-3 min-[720px]:hidden">
             {history.map((item) => {
-              const meta = getThermalMeta(item.heatwave_status);
+              const meta = getThermalMeta(item.heatwave_status, locale);
               const sign = item.delta_t >= 0 ? '+' : '';
+              const stationDisplay =
+                item.station_id !== null
+                  ? `${t.stationPrefix} ${item.station_id}${
+                      item.station_label.includes('disesuaikan') ||
+                      item.station_label.includes('adjusted')
+                        ? ` ${t.stationManualSuffix}`
+                        : ''
+                    }`
+                  : item.station_label;
+
               return (
                 <div
                   key={item.id}
@@ -138,7 +162,7 @@ export function SessionHistoryTable({
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-[0.875rem] font-semibold text-[var(--ink-primary)]">
-                      {item.station_label}
+                      {stationDisplay}
                     </span>
                     <span
                       style={{
@@ -157,7 +181,7 @@ export function SessionHistoryTable({
                       Next_Tmax: {item.predicted_tmax.toFixed(2)} °C
                     </span>
                     <span className="text-[var(--ink-secondary)]">
-                      Hari Ini: {item.present_tmax.toFixed(1)} °C
+                      {t.historyTodayShort}: {item.present_tmax.toFixed(1)} °C
                     </span>
                     <span className="text-[var(--ink-secondary)]">
                       Delta: {sign}
@@ -167,7 +191,7 @@ export function SessionHistoryTable({
 
                   <div className="flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-2">
                     <span className="text-[0.75rem] text-[var(--ink-muted)] tabular-nums">
-                      {item.timestamp} | {item.is_mock ? 'Simulasi FE' : 'API Live'}
+                      {item.timestamp} | {item.is_mock ? t.historySourceMock : t.historySourceLive}
                     </span>
                     <button
                       type="button"
@@ -175,7 +199,7 @@ export function SessionHistoryTable({
                       className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-text)] hover:bg-[var(--accent-tint)]"
                     >
                       <ArrowCounterClockwise size={15} aria-hidden="true" />
-                      Muat Ulang Input
+                      {t.historyReload}
                     </button>
                   </div>
                 </div>

@@ -1,9 +1,11 @@
 import { CheckCircle, Info, Snowflake, Warning, WarningOctagon } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
 import type { ThermalLevel } from '../../types/prediction';
 import { getThermalMeta } from '../../utils/thermalScale';
 
 interface HeatwaveBannerProps {
   level: ThermalLevel;
+  locale: Locale;
 }
 
 function ThermalStatusIcon({ level }: { level: ThermalLevel }) {
@@ -14,12 +16,12 @@ function ThermalStatusIcon({ level }: { level: ThermalLevel }) {
   return <WarningOctagon size={22} weight="bold" aria-hidden="true" />;
 }
 
-export function HeatwaveBanner({ level }: HeatwaveBannerProps) {
-  const meta = getThermalMeta(level);
+export function HeatwaveBanner({ level, locale }: HeatwaveBannerProps) {
+  const meta = getThermalMeta(level, locale);
 
   return (
     <section
-      aria-label="Banner peringatan dini gelombang panas"
+      aria-label={meta.bannerTitle}
       style={{
         backgroundColor: meta.bg,
         borderColor: meta.border,

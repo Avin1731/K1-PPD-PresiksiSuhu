@@ -1,11 +1,16 @@
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { ModelInfoResponse } from '../../types/prediction';
 
 interface DashboardIntroProps {
   stationCount: number;
   modelInfo: ModelInfoResponse;
+  locale: Locale;
 }
 
-export function DashboardIntro({ stationCount, modelInfo }: DashboardIntroProps) {
+export function DashboardIntro({ stationCount, modelInfo, locale }: DashboardIntroProps) {
+  const t = UI_STRINGS[locale];
+
   return (
     <section
       aria-labelledby="intro-section-heading"
@@ -17,28 +22,30 @@ export function DashboardIntro({ stationCount, modelInfo }: DashboardIntroProps)
             id="intro-section-heading"
             className="text-[1rem] font-bold leading-snug text-[var(--ink-primary)] min-[720px]:text-[1.0625rem]"
           >
-            Prakiraan Suhu Maksimum &amp; Peringatan Dini Gelombang Panas Seoul
+            {t.introTitle}
           </h2>
           <p className="max-w-[72ch] text-[0.875rem] leading-relaxed text-[var(--ink-secondary)]">
-            Memprediksi suhu maksimum esok hari (Next_Tmax) dan status peringatan KMA dari 21 parameter atmosfer LDAPS serta observasi di {stationCount} stasiun pengamatan cuaca Seoul.
+            {t.introDesc(stationCount)}
           </p>
         </div>
 
         <dl className="grid shrink-0 grid-cols-3 divide-x divide-[var(--border-subtle)] rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)]">
           <div className="px-3 py-2 text-center min-[720px]:px-4">
-            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Stasiun AWS</dt>
+            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+              {t.statStations}
+            </dt>
             <dd className="mt-0.5 text-[0.9375rem] font-bold text-[var(--ink-primary)] tabular-nums">
               {stationCount}
             </dd>
           </div>
           <div className="px-3 py-2 text-center min-[720px]:px-4">
-            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Akurasi R2</dt>
+            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">{t.statR2}</dt>
             <dd className="mt-0.5 text-[0.9375rem] font-bold text-[var(--ink-primary)] tabular-nums">
               {(modelInfo.metrics.r2 * 100).toFixed(2)}%
             </dd>
           </div>
           <div className="px-3 py-2 text-center min-[720px]:px-4">
-            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Galat MAE</dt>
+            <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">{t.statMae}</dt>
             <dd className="mt-0.5 text-[0.9375rem] font-bold text-[var(--ink-primary)] tabular-nums">
               {modelInfo.metrics.mae.toFixed(2)} °C
             </dd>

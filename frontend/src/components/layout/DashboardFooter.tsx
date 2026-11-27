@@ -1,10 +1,15 @@
 import { ArrowSquareOut } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 
 interface DashboardFooterProps {
   isSingleMode: boolean;
+  locale: Locale;
 }
 
-export function DashboardFooter({ isSingleMode }: DashboardFooterProps) {
+export function DashboardFooter({ isSingleMode, locale }: DashboardFooterProps) {
+  const t = UI_STRINGS[locale];
+
   return (
     <footer
       className={`mt-auto border-t border-[var(--border-subtle)] bg-[var(--surface-primary)] px-4 pt-5 min-[720px]:px-6 min-[720px]:py-5 ${
@@ -13,23 +18,19 @@ export function DashboardFooter({ isSingleMode }: DashboardFooterProps) {
     >
       <div className="mx-auto flex max-w-[1360px] flex-col gap-3 min-[1100px]:flex-row min-[1100px]:items-center min-[1100px]:justify-between">
         <div className="space-y-0.5 text-[0.8125rem]">
-          <p className="font-semibold text-[var(--ink-primary)]">
-            Proyek UAS Praktikum Penambangan Data, D4 Rekayasa Perangkat Lunak SV UGM | Kelompok 1
-          </p>
-          <p className="text-[var(--ink-secondary)]">
-            Sistem pendukung keputusan prakiraan suhu harian dan mitigasi gelombang panas Kota Seoul.
-          </p>
+          <p className="font-semibold text-[var(--ink-primary)]">{t.footerProject}</p>
+          <p className="text-[var(--ink-secondary)]">{t.footerTagline}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem] text-[var(--ink-muted)]">
-          <span>RandomForestRegressor (rf_model.joblib) | Dataset UCI Seoul Temperature / LDAPS</span>
+          <span>{t.footerModel}</span>
           <a
             href="https://github.com/Avin1731/K1-PPD-PresiksiSuhu"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-3 font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--accent-tint)]"
           >
-            Repositori GitHub
+            {t.footerRepo}
             <ArrowSquareOut size={16} aria-hidden="true" />
           </a>
         </div>

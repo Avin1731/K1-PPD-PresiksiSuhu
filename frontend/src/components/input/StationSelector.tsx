@@ -1,4 +1,6 @@
 import { MapPin } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { StationPreset } from '../../types/prediction';
 
 interface StationSelectorProps {
@@ -6,6 +8,7 @@ interface StationSelectorProps {
   selectedStationId: number;
   isManualGeoOverride: boolean;
   onSelectStation: (station: StationPreset) => void;
+  locale: Locale;
 }
 
 export function StationSelector({
@@ -13,7 +16,9 @@ export function StationSelector({
   selectedStationId,
   isManualGeoOverride,
   onSelectStation,
+  locale,
 }: StationSelectorProps) {
+  const t = UI_STRINGS[locale];
   const activeStation =
     stations.find((item) => item.station_id === selectedStationId) ?? stations[0];
 
@@ -25,11 +30,11 @@ export function StationSelector({
           className="inline-flex items-center gap-1.5 text-[0.875rem] font-semibold text-[var(--ink-primary)]"
         >
           <MapPin size={16} className="text-[var(--accent-text)]" aria-hidden="true" />
-          Stasiun Pengamatan Cuaca Seoul (1 - 25)
+          {t.stationLabel}
         </label>
         {isManualGeoOverride && (
           <span className="rounded-[6px] border border-[var(--thermal-warm-border)] bg-[var(--thermal-warm-bg)] px-2 py-0.5 text-[0.75rem] font-semibold text-[var(--thermal-warm-ink)]">
-            Koordinat disesuaikan manual
+            {t.stationManualTag}
           </span>
         )}
       </div>
@@ -46,14 +51,14 @@ export function StationSelector({
       >
         {stations.map((station) => (
           <option key={station.station_id} value={station.station_id}>
-            {station.district_name} ({station.lat.toFixed(4)}°N, {station.lon.toFixed(4)}°E | DEM {station.DEM.toFixed(1)} m)
+            {t.stationPrefix} {station.station_id} ({station.lat.toFixed(4)}°N, {station.lon.toFixed(4)}°E | DEM {station.DEM.toFixed(1)} m)
           </option>
         ))}
       </select>
 
       {activeStation && (
         <p className="text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
-          Auto-fill aktif: lat {activeStation.lat.toFixed(4)}, lon {activeStation.lon.toFixed(4)}, DEM{' '}
+          {t.stationAutoFillPrefix}: lat {activeStation.lat.toFixed(4)}, lon {activeStation.lon.toFixed(4)}, DEM{' '}
           {activeStation.DEM.toFixed(1)} m, Slope {activeStation.Slope.toFixed(4)}
         </p>
       )}

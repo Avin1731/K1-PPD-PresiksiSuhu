@@ -20,9 +20,11 @@ import { ResultErrorState } from './components/output/ResultErrorState';
 import { ResultSkeleton } from './components/output/ResultSkeleton';
 import { SessionHistoryTable } from './components/output/SessionHistoryTable';
 import { ThermalGauge } from './components/output/ThermalGauge';
+import { useLanguage } from './hooks/useLanguage';
 import { usePrediction } from './hooks/usePrediction';
 import { useSessionHistory } from './hooks/useSessionHistory';
 import { useTheme } from './hooks/useTheme';
+import { UI_STRINGS } from './i18n/translations';
 import {
   MODEL_FEATURE_ORDER,
   type FeatureKey,
@@ -67,6 +69,8 @@ export default function App() {
 
   const { history, addEntry, clearHistory } = useSessionHistory();
   const { theme, toggleTheme } = useTheme();
+  const { locale, setLocale } = useLanguage();
+  const t = UI_STRINGS[locale];
 
   const initialPreset = SCENARIO_PRESETS[0];
 
@@ -81,14 +85,15 @@ export default function App() {
     featuresToDraft(initialPreset.features)
   );
   const [submittedValidation, setSubmittedValidation] = useState<boolean>(false);
-  const [lastPredictedStationLabel, setLastPredictedStationLabel] = useState<string>(
-    `Stasiun ${initialPreset.station_id}`
+  const [lastPredictedStationId, setLastPredictedStationId] = useState<number>(
+    initialPreset.station_id
   );
+  const [lastPredictedManualGeo, setLastPredictedManualGeo] = useState<boolean>(false);
   const [lastPredictedFeatures, setLastPredictedFeatures] = useState<WeatherFeatures>(
     initialPreset.features
   );
 
-  const validation = useMemo(() => validateFeatureDraft(draft), [draft]);
+  const validation = useMemo(() => validateFeatureDraft(draft, locale), [draft, locale]);
 
   const combinedErrors: FeatureValidationErrors = useMemo(() => {
     const merged: FeatureValidationErrors = {};
@@ -139,15 +144,12 @@ export default function App() {
       return;
     }
 
-    const stationObj = stations.find((item) => item.station_id === selectedStationId);
-    const stationText = stationObj
-      ? stationObj.district_name
-      : `Stasiun ${selectedStationId}`;
     const label = isManualGeoOverride
-      ? `${stationText} (Koordinat disesuaikan)`
-      : stationText;
+      ? `${t.stationPrefix} ${selectedStationId} ${t.stationManualSuffix}`
+      : `${t.stationPrefix} ${selectedStationId}`;
 
-    setLastPredictedStationLabel(label);
+    setLastPredictedStationId(selectedStationId);
+    setLastPredictedManualGeo(isManualGeoOverride);
     setLastPredictedFeatures(validation.parsed);
 
     const response = await runSinglePrediction({
@@ -184,7 +186,9 @@ export default function App() {
     if (item.station_id !== null) {
       setSelectedStationId(item.station_id);
     }
-    setIsManualGeoOverride(item.station_label.includes('disesuaikan'));
+    setIsManualGeoOverride(
+      item.station_label.includes('disesuaikan') || item.station_label.includes('adjusted')
+    );
     setActivePresetId(null);
     setDraft(featuresToDraft(item.features));
     setSubmittedValidation(false);
@@ -197,6 +201,10 @@ export default function App() {
       ? result.top_factors
       : modelInfo.feature_importances;
 
+  const displayedStationLabel = lastPredictedManualGeo
+    ? `${t.stationPrefix} ${lastPredictedStationId} ${t.stationManualSuffix}`
+    : `${t.stationPrefix} ${lastPredictedStationId}`;
+
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
       <DashboardHeader
@@ -207,13 +215,15 @@ export default function App() {
         onRefreshHealth={() => void refreshHealth(serviceMode)}
         theme={theme}
         onToggleTheme={toggleTheme}
+        locale={locale}
+        onChangeLocale={setLocale}
       />
 
       <main className="mx-auto w-full max-w-[1360px] flex-1 space-y-5 px-4 py-5 min-[720px]:px-6 min-[720px]:py-6">
-        <DashboardIntro stationCount={stations.length} modelInfo={modelInfo} />
+        <DashboardIntro stationCount={stations.length} modelInfo={modelInfo} locale={locale} />
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <ModeSwitcher mode={workspaceMode} onChangeMode={setWorkspaceMode} />
+          <ModeSwitcher mode={workspaceMode} onChangeMode={setWorkspaceMode} locale={locale} />
         </div>
 
         {workspaceMode === 'batch' ? (
@@ -225,21 +235,22 @@ export default function App() {
             result={batchResult}
             onUploadFile={(file) => void runBatchPrediction(file)}
             onClear={clearBatchResult}
+            locale={locale}
           />
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 items-start gap-6 min-[1100px]:grid-cols-[46fr_54fr]">
               {/* Kolom Kiri: Kontrol Input Data */}
               <section
-                aria-label="Kontrol input cuaca"
+                aria-label={t.inputPanelTitle}
                 className="min-w-0 space-y-5 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-4 min-[720px]:p-5"
               >
                 <div className="border-b border-[var(--border-subtle)] pb-3">
                   <h2 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
-                    Parameter Cuaca &amp; Stasiun (21 Fitur Model)
+                    {t.inputPanelTitle}
                   </h2>
                   <p className="mt-0.5 text-[0.8125rem] text-[var(--ink-secondary)]">
-                    Pilih stasiun dan skenario cepat, atau ubah parameter per kategori tab.
+                    {t.inputPanelSubtitle}
                   </p>
                 </div>
 
@@ -248,12 +259,14 @@ export default function App() {
                   selectedStationId={selectedStationId}
                   isManualGeoOverride={isManualGeoOverride}
                   onSelectStation={handleSelectStation}
+                  locale={locale}
                 />
 
                 <ScenarioPresets
                   presets={presets}
                   activePresetId={activePresetId}
                   onSelectPreset={handleSelectPreset}
+                  locale={locale}
                 />
 
                 <WeatherInputTabs
@@ -263,57 +276,64 @@ export default function App() {
                   errors={combinedErrors}
                   warnings={validation.warnings}
                   onChangeField={handleChangeField}
+                  locale={locale}
                 />
 
                 <PredictActionBar
                   loading={loading}
                   onPredict={() => void handlePredict()}
                   onReset={handleReset}
+                  locale={locale}
                 />
               </section>
 
               {/* Kolom Kanan: Visualisasi & Hasil Prediksi */}
-              <section aria-label="Hasil prediksi" className="min-w-0 space-y-4">
+              <section aria-label={t.heroTitle} className="min-w-0 space-y-4">
                 {loading ? (
-                  <ResultSkeleton />
+                  <ResultSkeleton locale={locale} />
                 ) : error ? (
                   <ResultErrorState
                     message={error}
                     serviceMode={serviceMode}
                     onRetry={() => void handlePredict()}
                     onSwitchToMock={() => setServiceMode('mock')}
+                    locale={locale}
                   />
                 ) : result ? (
                   <>
                     <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
                       <HeroPredictionCard
                         prediction={result}
-                        stationLabel={lastPredictedStationLabel}
+                        stationLabel={displayedStationLabel}
+                        locale={locale}
                       />
                       <ThermalGauge
                         temperature={result.predicted_tmax}
                         level={result.heatwave_status}
+                        locale={locale}
                       />
                     </div>
 
-                    <HeatwaveBanner level={result.heatwave_status} />
+                    <HeatwaveBanner level={result.heatwave_status} locale={locale} />
 
                     <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
                       <DeltaIndicator
                         presentTmax={result.present_tmax}
                         predictedTmax={result.predicted_tmax}
                         deltaT={result.delta_t}
+                        locale={locale}
                       />
-                      <HealthAdvisory level={result.heatwave_status} />
+                      <HealthAdvisory level={result.heatwave_status} locale={locale} />
                     </div>
 
                     <FeatureImportanceChart
                       factors={activeFactors}
                       inputFeatures={lastPredictedFeatures}
+                      locale={locale}
                     />
                   </>
                 ) : (
-                  <ResultEmptyState />
+                  <ResultEmptyState locale={locale} />
                 )}
               </section>
             </div>
@@ -322,12 +342,13 @@ export default function App() {
               history={history}
               onLoadHistory={handleLoadHistory}
               onClearHistory={clearHistory}
+              locale={locale}
             />
           </div>
         )}
       </main>
 
-      <DashboardFooter isSingleMode={workspaceMode === 'single'} />
+      <DashboardFooter isSingleMode={workspaceMode === 'single'} locale={locale} />
     </div>
   );
 }

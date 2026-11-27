@@ -1,9 +1,12 @@
 import { FEATURE_META_MAP } from '../../data/featureMeta';
+import type { Locale } from '../../hooks/useLanguage';
+import { FEATURE_EN_MAP, UI_STRINGS } from '../../i18n/translations';
 import type { FeatureImportanceItem, WeatherFeatures } from '../../types/prediction';
 
 interface FeatureImportanceChartProps {
   factors: FeatureImportanceItem[];
   inputFeatures: WeatherFeatures;
+  locale: Locale;
 }
 
 function formatInputValue(value: number): string {
@@ -15,7 +18,9 @@ function formatInputValue(value: number): string {
 export function FeatureImportanceChart({
   factors,
   inputFeatures,
+  locale,
 }: FeatureImportanceChartProps) {
+  const t = UI_STRINGS[locale];
   const topFactors = factors.slice(0, 7);
   const maxImportance = Math.max(...topFactors.map((item) => item.importance), 0.01);
 
@@ -27,17 +32,17 @@ export function FeatureImportanceChart({
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--border-subtle)] pb-3">
         <div>
           <h2 id="xai-chart-heading" className="text-[1rem] font-semibold text-[var(--ink-primary)]">
-            Variabel apa yang paling memengaruhi prediksi model?
+            {t.xaiTitle}
           </h2>
-          <p className="mt-0.5 text-[0.8125rem] text-[var(--ink-secondary)]">
-            Bobot kontribusi global 7 fitur teratas pada Random Forest (rf_model.joblib) beserta nilai input yang Anda masukkan.
-          </p>
+          <p className="mt-0.5 text-[0.8125rem] text-[var(--ink-secondary)]">{t.xaiSubtitle}</p>
         </div>
       </div>
 
       <div className="mt-4 space-y-3">
         {topFactors.map((item, idx) => {
           const meta = FEATURE_META_MAP[item.feature];
+          const label =
+            locale === 'en' ? FEATURE_EN_MAP[item.feature].label : (meta?.label ?? item.feature);
           const pct = item.importance * 100;
           const barWidth = Math.max(4, Math.round((item.importance / maxImportance) * 100));
           const activeVal =
@@ -48,15 +53,13 @@ export function FeatureImportanceChart({
             <div key={item.feature} className="space-y-1">
               <div className="flex flex-wrap items-baseline justify-between gap-2 text-[0.8125rem]">
                 <div className="min-w-0">
-                  <span className="font-semibold text-[var(--ink-primary)]">
-                    {meta ? meta.label : item.feature}
-                  </span>{' '}
+                  <span className="font-semibold text-[var(--ink-primary)]">{label}</span>{' '}
                   <span className="text-[var(--ink-muted)]">({item.feature})</span>
                 </div>
 
                 <div className="flex items-baseline gap-3 tabular-nums">
                   <span className="text-[var(--ink-secondary)]">
-                    Input: {formatInputValue(activeVal)} {meta?.unit ?? ''}
+                    {t.xaiInputLabel}: {formatInputValue(activeVal)} {meta?.unit ?? ''}
                   </span>
                   <span
                     className={`min-w-[48px] text-right font-bold ${
