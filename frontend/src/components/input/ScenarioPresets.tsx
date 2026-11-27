@@ -39,7 +39,7 @@ export function ScenarioPresets({
               onClick={() => onSelectPreset(preset)}
               aria-pressed={isActive}
               title={preset.description}
-              className={`flex min-h-[46px] items-center gap-2 rounded-[8px] border px-3 py-2 text-left text-[0.875rem] font-semibold transition-colors ${
+              className={`flex min-h-[46px] items-center gap-2 rounded-[8px] border px-3 py-2 text-left text-[0.8125rem] font-semibold leading-snug transition-colors ${
                 isActive
                   ? 'border-[var(--accent-primary)] bg-[var(--accent-tint)] text-[var(--accent-primary)]'
                   : 'border-[var(--border-subtle)] bg-[var(--surface-primary)] text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
@@ -48,7 +48,7 @@ export function ScenarioPresets({
               <span className="shrink-0">
                 <PresetGlyph id={preset.id} />
               </span>
-              <span className="truncate">{preset.name}</span>
+              <span>{preset.name}</span>
             </button>
           );
         })}
