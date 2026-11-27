@@ -5,6 +5,7 @@ import { SEOUL_STATIONS } from '../data/stations';
 import { HttpApiError } from '../services/httpClient';
 import { defaultServiceMode, getServiceByMode } from '../services/predictionService';
 import type {
+  BatchPredictResponse,
   HealthResponse,
   ModelInfoResponse,
   ScenarioPreset,
@@ -12,6 +13,7 @@ import type {
   SinglePredictResponse,
   StationPreset,
 } from '../types/prediction';
+import { validateCsvFileClient } from '../utils/csvParser';
 import type { FeatureValidationErrors } from '../utils/validation';
 
 export function usePrediction() {
@@ -28,31 +30,39 @@ export function usePrediction() {
   const [serverFieldErrors, setServerFieldErrors] = useState<FeatureValidationErrors>({});
   const [result, setResult] = useState<SinglePredictResponse | null>(null);
 
-  const refreshHealth = useCallback(async (mode: 'live' | 'mock' = serviceMode) => {
-    const svc = getServiceByMode(mode);
-    setCheckingHealth(true);
-    setHealthError(null);
+  const [batchLoading, setBatchLoading] = useState<boolean>(false);
+  const [batchError, setBatchError] = useState<string | null>(null);
+  const [batchMissingColumns, setBatchMissingColumns] = useState<string[]>([]);
+  const [batchResult, setBatchResult] = useState<BatchPredictResponse | null>(null);
 
-    try {
-      const [healthRes, infoRes, stationsRes, presetsRes] = await Promise.all([
-        svc.checkHealth(),
-        svc.getModelInfo(),
-        svc.getStations(),
-        svc.getPresets(),
-      ]);
-      setHealth(healthRes);
-      setModelInfo(infoRes);
-      if (stationsRes.length > 0) setStations(stationsRes);
-      if (presetsRes.length > 0) setPresets(presetsRes);
-    } catch (err) {
-      setHealth(null);
-      setHealthError(
-        err instanceof Error ? err.message : 'Gagal memeriksa koneksi ke server backend.'
-      );
-    } finally {
-      setCheckingHealth(false);
-    }
-  }, [serviceMode]);
+  const refreshHealth = useCallback(
+    async (mode: 'live' | 'mock' = serviceMode) => {
+      const svc = getServiceByMode(mode);
+      setCheckingHealth(true);
+      setHealthError(null);
+
+      try {
+        const [healthRes, infoRes, stationsRes, presetsRes] = await Promise.all([
+          svc.checkHealth(),
+          svc.getModelInfo(),
+          svc.getStations(),
+          svc.getPresets(),
+        ]);
+        setHealth(healthRes);
+        setModelInfo(infoRes);
+        if (stationsRes.length > 0) setStations(stationsRes);
+        if (presetsRes.length > 0) setPresets(presetsRes);
+      } catch (err) {
+        setHealth(null);
+        setHealthError(
+          err instanceof Error ? err.message : 'Gagal memeriksa koneksi ke server backend.'
+        );
+      } finally {
+        setCheckingHealth(false);
+      }
+    },
+    [serviceMode]
+  );
 
   useEffect(() => {
     void refreshHealth(serviceMode);
@@ -86,10 +96,53 @@ export function usePrediction() {
     [serviceMode]
   );
 
+  const runBatchPrediction = useCallback(
+    async (file: File): Promise<BatchPredictResponse | null> => {
+      const precheck = await validateCsvFileClient(file);
+      if (!precheck.valid) {
+        setBatchResult(null);
+        setBatchError(precheck.message);
+        setBatchMissingColumns(precheck.missingColumns ?? []);
+        return null;
+      }
+
+      const svc = getServiceByMode(serviceMode);
+      setBatchLoading(true);
+      setBatchError(null);
+      setBatchMissingColumns([]);
+
+      try {
+        const response = await svc.predictBatch(file);
+        setBatchResult(response);
+        return response;
+      } catch (err) {
+        setBatchResult(null);
+        if (err instanceof HttpApiError && err.details?.missing_columns) {
+          setBatchMissingColumns(err.details.missing_columns);
+        }
+        setBatchError(
+          err instanceof Error
+            ? err.message
+            : 'Gagal memproses file CSV. Periksa kembali isi berkas atau koneksi server.'
+        );
+        return null;
+      } finally {
+        setBatchLoading(false);
+      }
+    },
+    [serviceMode]
+  );
+
   const clearResult = useCallback(() => {
     setResult(null);
     setError(null);
     setServerFieldErrors({});
+  }, []);
+
+  const clearBatchResult = useCallback(() => {
+    setBatchResult(null);
+    setBatchError(null);
+    setBatchMissingColumns([]);
   }, []);
 
   return {
@@ -105,8 +158,14 @@ export function usePrediction() {
     error,
     serverFieldErrors,
     result,
+    batchLoading,
+    batchError,
+    batchMissingColumns,
+    batchResult,
     refreshHealth,
     runSinglePrediction,
+    runBatchPrediction,
     clearResult,
+    clearBatchResult,
   };
 }
