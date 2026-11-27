@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FEATURE_META_MAP } from './data/featureMeta';
 import { SCENARIO_PRESETS } from './data/presets';
+import { BatchCsvPanel } from './components/input/BatchCsvPanel';
 import { PredictActionBar } from './components/input/PredictActionBar';
 import { ScenarioPresets } from './components/input/ScenarioPresets';
 import { StationSelector } from './components/input/StationSelector';
@@ -15,13 +16,16 @@ import { HeroPredictionCard } from './components/output/HeroPredictionCard';
 import { ResultEmptyState } from './components/output/ResultEmptyState';
 import { ResultErrorState } from './components/output/ResultErrorState';
 import { ResultSkeleton } from './components/output/ResultSkeleton';
+import { SessionHistoryTable } from './components/output/SessionHistoryTable';
 import { ThermalGauge } from './components/output/ThermalGauge';
 import { usePrediction } from './hooks/usePrediction';
+import { useSessionHistory } from './hooks/useSessionHistory';
 import {
   MODEL_FEATURE_ORDER,
   type FeatureKey,
   type InputTabId,
   type ScenarioPreset,
+  type SessionHistoryItem,
   type StationPreset,
   type WeatherFeatures,
 } from './types/prediction';
@@ -47,10 +51,18 @@ export default function App() {
     error,
     serverFieldErrors,
     result,
+    batchLoading,
+    batchError,
+    batchMissingColumns,
+    batchResult,
     refreshHealth,
     runSinglePrediction,
+    runBatchPrediction,
     clearResult,
+    clearBatchResult,
   } = usePrediction();
+
+  const { history, addEntry, clearHistory } = useSessionHistory();
 
   const initialPreset = SCENARIO_PRESETS[0];
 
@@ -133,10 +145,24 @@ export default function App() {
 
     setLastPredictedStationLabel(label);
     setLastPredictedFeatures(validation.parsed);
-    await runSinglePrediction({
+
+    const response = await runSinglePrediction({
       station_id: selectedStationId,
       features: validation.parsed,
     });
+
+    if (response) {
+      addEntry({
+        station_id: selectedStationId,
+        station_label: label,
+        present_tmax: response.present_tmax,
+        predicted_tmax: response.predicted_tmax,
+        delta_t: response.delta_t,
+        heatwave_status: response.heatwave_status,
+        is_mock: Boolean(response.is_mock),
+        features: validation.parsed,
+      });
+    }
   }
 
   function handleReset() {
@@ -148,6 +174,18 @@ export default function App() {
     setDraft(featuresToDraft(defaultPreset.features));
     setSubmittedValidation(false);
     clearResult();
+  }
+
+  function handleLoadHistory(item: SessionHistoryItem) {
+    if (item.station_id !== null) {
+      setSelectedStationId(item.station_id);
+    }
+    setIsManualGeoOverride(item.station_label.includes('disesuaikan'));
+    setActivePresetId(null);
+    setDraft(featuresToDraft(item.features));
+    setSubmittedValidation(false);
+    setWorkspaceMode('single');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const activeFactors =
@@ -165,7 +203,11 @@ export default function App() {
         onRefreshHealth={() => void refreshHealth(serviceMode)}
       />
 
-      <main className="mx-auto max-w-[1360px] space-y-5 px-4 pt-5 pb-28 min-[720px]:px-6 min-[720px]:py-6">
+      <main
+        className={`mx-auto max-w-[1360px] space-y-5 px-4 pt-5 min-[720px]:px-6 min-[720px]:py-6 ${
+          workspaceMode === 'single' ? 'pb-28' : 'pb-8'
+        }`}
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <ModeSwitcher mode={workspaceMode} onChangeMode={setWorkspaceMode} />
           <p className="text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
@@ -175,110 +217,112 @@ export default function App() {
         </div>
 
         {workspaceMode === 'batch' ? (
-          <section className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-6">
-            <h2 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
-              Mode Batch CSV (Disiapkan di Fase 4)
-            </h2>
-            <p className="mt-1.5 max-w-[68ch] text-[0.9375rem] text-[var(--ink-secondary)]">
-              Unggah berkas CSV multi-baris, unduh template 21 fitur model, dan ekspor hasil prediksi massal akan diaktifkan setelah Fase 3 disetujui.
-            </p>
-            <button
-              type="button"
-              onClick={() => setWorkspaceMode('single')}
-              className="mt-4 inline-flex min-h-[44px] items-center rounded-[8px] bg-[var(--accent-primary)] px-4 text-[0.875rem] font-semibold text-white transition-colors hover:bg-[var(--accent-hover)]"
-            >
-              Kembali ke Prediksi Tunggal
-            </button>
-          </section>
+          <BatchCsvPanel
+            presets={presets}
+            loading={batchLoading}
+            error={batchError}
+            missingColumns={batchMissingColumns}
+            result={batchResult}
+            onUploadFile={(file) => void runBatchPrediction(file)}
+            onClear={clearBatchResult}
+          />
         ) : (
-          <div className="grid grid-cols-1 items-start gap-6 min-[1100px]:grid-cols-[46fr_54fr]">
-            {/* Kolom Kiri: Kontrol Input Data */}
-            <section
-              aria-label="Kontrol input cuaca"
-              className="min-w-0 space-y-5 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-4 min-[720px]:p-5"
-            >
-              <div className="border-b border-[var(--border-subtle)] pb-3">
-                <h2 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
-                  Parameter Cuaca &amp; Stasiun (21 Fitur Model)
-                </h2>
-                <p className="mt-0.5 text-[0.8125rem] text-[var(--ink-secondary)]">
-                  Pilih stasiun dan skenario cepat, atau ubah parameter per kategori tab.
-                </p>
-              </div>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 items-start gap-6 min-[1100px]:grid-cols-[46fr_54fr]">
+              {/* Kolom Kiri: Kontrol Input Data */}
+              <section
+                aria-label="Kontrol input cuaca"
+                className="min-w-0 space-y-5 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-4 min-[720px]:p-5"
+              >
+                <div className="border-b border-[var(--border-subtle)] pb-3">
+                  <h2 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
+                    Parameter Cuaca &amp; Stasiun (21 Fitur Model)
+                  </h2>
+                  <p className="mt-0.5 text-[0.8125rem] text-[var(--ink-secondary)]">
+                    Pilih stasiun dan skenario cepat, atau ubah parameter per kategori tab.
+                  </p>
+                </div>
 
-              <StationSelector
-                stations={stations}
-                selectedStationId={selectedStationId}
-                isManualGeoOverride={isManualGeoOverride}
-                onSelectStation={handleSelectStation}
-              />
-
-              <ScenarioPresets
-                presets={presets}
-                activePresetId={activePresetId}
-                onSelectPreset={handleSelectPreset}
-              />
-
-              <WeatherInputTabs
-                activeTab={activeTab}
-                onChangeTab={setActiveTab}
-                draft={draft}
-                errors={combinedErrors}
-                warnings={validation.warnings}
-                onChangeField={handleChangeField}
-              />
-
-              <PredictActionBar
-                loading={loading}
-                onPredict={() => void handlePredict()}
-                onReset={handleReset}
-              />
-            </section>
-
-            {/* Kolom Kanan: Visualisasi & Hasil Prediksi (Fase 3 lengkap) */}
-            <section aria-label="Hasil prediksi" className="min-w-0 space-y-4">
-              {loading ? (
-                <ResultSkeleton />
-              ) : error ? (
-                <ResultErrorState
-                  message={error}
-                  serviceMode={serviceMode}
-                  onRetry={() => void handlePredict()}
-                  onSwitchToMock={() => setServiceMode('mock')}
+                <StationSelector
+                  stations={stations}
+                  selectedStationId={selectedStationId}
+                  isManualGeoOverride={isManualGeoOverride}
+                  onSelectStation={handleSelectStation}
                 />
-              ) : result ? (
-                <>
-                  <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
-                    <HeroPredictionCard
-                      prediction={result}
-                      stationLabel={lastPredictedStationLabel}
-                    />
-                    <ThermalGauge
-                      temperature={result.predicted_tmax}
-                      level={result.heatwave_status}
-                    />
-                  </div>
 
-                  <HeatwaveBanner level={result.heatwave_status} />
+                <ScenarioPresets
+                  presets={presets}
+                  activePresetId={activePresetId}
+                  onSelectPreset={handleSelectPreset}
+                />
 
-                  <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
-                    <DeltaIndicator
-                      presentTmax={result.present_tmax}
-                      predictedTmax={result.predicted_tmax}
-                      deltaT={result.delta_t}
-                    />
-                    <HealthAdvisory level={result.heatwave_status} />
-                  </div>
+                <WeatherInputTabs
+                  activeTab={activeTab}
+                  onChangeTab={setActiveTab}
+                  draft={draft}
+                  errors={combinedErrors}
+                  warnings={validation.warnings}
+                  onChangeField={handleChangeField}
+                />
 
-                  <FeatureImportanceChart
-                    factors={activeFactors}
-                    inputFeatures={lastPredictedFeatures}
+                <PredictActionBar
+                  loading={loading}
+                  onPredict={() => void handlePredict()}
+                  onReset={handleReset}
+                />
+              </section>
+
+              {/* Kolom Kanan: Visualisasi & Hasil Prediksi */}
+              <section aria-label="Hasil prediksi" className="min-w-0 space-y-4">
+                {loading ? (
+                  <ResultSkeleton />
+                ) : error ? (
+                  <ResultErrorState
+                    message={error}
+                    serviceMode={serviceMode}
+                    onRetry={() => void handlePredict()}
+                    onSwitchToMock={() => setServiceMode('mock')}
                   />
-                </>
-              ) : (
-                <ResultEmptyState />
-              )}
-            </section>
+                ) : result ? (
+                  <>
+                    <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
+                      <HeroPredictionCard
+                        prediction={result}
+                        stationLabel={lastPredictedStationLabel}
+                      />
+                      <ThermalGauge
+                        temperature={result.predicted_tmax}
+                        level={result.heatwave_status}
+                      />
+                    </div>
+
+                    <HeatwaveBanner level={result.heatwave_status} />
+
+                    <div className="grid grid-cols-1 gap-4 min-[720px]:grid-cols-2">
+                      <DeltaIndicator
+                        presentTmax={result.present_tmax}
+                        predictedTmax={result.predicted_tmax}
+                        deltaT={result.delta_t}
+                      />
+                      <HealthAdvisory level={result.heatwave_status} />
+                    </div>
+
+                    <FeatureImportanceChart
+                      factors={activeFactors}
+                      inputFeatures={lastPredictedFeatures}
+                    />
+                  </>
+                ) : (
+                  <ResultEmptyState />
+                )}
+              </section>
+            </div>
+
+            <SessionHistoryTable
+              history={history}
+              onLoadHistory={handleLoadHistory}
+              onClearHistory={clearHistory}
+            />
           </div>
         )}
       </main>
