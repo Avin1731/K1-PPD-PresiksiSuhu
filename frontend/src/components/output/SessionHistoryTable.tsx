@@ -113,7 +113,7 @@ export function SessionHistoryTable({
                         <button
                           type="button"
                           onClick={() => onLoadHistory(item)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-tint)]"
+                          className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-tint)]"
                         >
                           <ArrowCounterClockwise size={15} aria-hidden="true" />
                           Muat Ulang Input
@@ -172,7 +172,7 @@ export function SessionHistoryTable({
                     <button
                       type="button"
                       onClick={() => onLoadHistory(item)}
-                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-primary)] hover:bg-[var(--accent-tint)]"
+                      className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-3 text-[0.8125rem] font-semibold text-[var(--accent-primary)] hover:bg-[var(--accent-tint)]"
                     >
                       <ArrowCounterClockwise size={15} aria-hidden="true" />
                       Muat Ulang Input

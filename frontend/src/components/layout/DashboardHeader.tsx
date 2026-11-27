@@ -39,7 +39,7 @@ export function DashboardHeader({
             <button
               type="button"
               onClick={() => onChangeServiceMode('live')}
-              className={`min-h-[40px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
+              className={`min-h-[44px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
                 serviceMode === 'live'
                   ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
@@ -50,7 +50,7 @@ export function DashboardHeader({
             <button
               type="button"
               onClick={() => onChangeServiceMode('mock')}
-              className={`min-h-[40px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
+              className={`min-h-[44px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
                 serviceMode === 'mock'
                   ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
@@ -61,7 +61,7 @@ export function DashboardHeader({
           </div>
 
           {checkingHealth ? (
-            <span className="inline-flex min-h-[40px] items-center rounded-[6px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-3 text-[0.8125rem] font-medium text-[var(--ink-secondary)]">
+            <span className="inline-flex min-h-[44px] items-center rounded-[6px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-3 text-[0.8125rem] font-medium text-[var(--ink-secondary)]">
               Memeriksa koneksi...
             </span>
           ) : healthError ? (
@@ -69,7 +69,7 @@ export function DashboardHeader({
               type="button"
               onClick={onRefreshHealth}
               title="Klik untuk memeriksa ulang koneksi server backend"
-              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-[6px] border border-[var(--thermal-warning-border)] bg-[var(--thermal-warning-bg)] px-3 text-[0.8125rem] font-semibold text-[var(--thermal-warning-ink)] transition-colors hover:opacity-90"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[6px] border border-[var(--thermal-warning-border)] bg-[var(--thermal-warning-bg)] px-3 text-[0.8125rem] font-semibold text-[var(--thermal-warning-ink)] transition-colors hover:opacity-90"
             >
               <WarningCircle size={16} weight="bold" aria-hidden="true" />
               API Tidak Terhubung
@@ -77,7 +77,7 @@ export function DashboardHeader({
             </button>
           ) : (
             <span
-              className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-[6px] border px-3 text-[0.8125rem] font-semibold ${
+              className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-[6px] border px-3 text-[0.8125rem] font-semibold ${
                 serviceMode === 'live'
                   ? 'border-[var(--thermal-normal-border)] bg-[var(--thermal-normal-bg)] text-[var(--thermal-normal-ink)]'
                   : 'border-[var(--thermal-warm-border)] bg-[var(--thermal-warm-bg)] text-[var(--thermal-warm-ink)]'
