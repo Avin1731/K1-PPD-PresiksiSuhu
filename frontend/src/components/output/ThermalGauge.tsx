@@ -1,9 +1,12 @@
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { ThermalLevel } from '../../types/prediction';
 import { getThermalMeta } from '../../utils/thermalScale';
 
 interface ThermalGaugeProps {
   temperature: number;
   level: ThermalLevel;
+  locale: Locale;
 }
 
 const MIN_TEMP = 15;
@@ -41,20 +44,21 @@ function buildArcPath(fromTemp: number, toTemp: number): string {
   return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${RADIUS} ${RADIUS} 0 0 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`;
 }
 
-export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
-  const meta = getThermalMeta(level);
+export function ThermalGauge({ temperature, level, locale }: ThermalGaugeProps) {
+  const t = UI_STRINGS[locale];
+  const meta = getThermalMeta(level, locale);
   const clamped = Math.max(MIN_TEMP, Math.min(MAX_TEMP, temperature));
   const frac = (clamped - MIN_TEMP) / (MAX_TEMP - MIN_TEMP);
   const needleDegrees = -90 + frac * 180;
 
   return (
     <section
-      aria-label="Pengukur skala termal terkalibrasi"
+      aria-label={t.gaugeTitle}
       className="flex flex-col justify-between rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
     >
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">
-          Skala Termal Terkalibrasi
+          {t.gaugeTitle}
         </h2>
         <span className="text-[0.8125rem] font-medium text-[var(--ink-muted)] tabular-nums">
           15 - 40 °C
@@ -66,9 +70,8 @@ export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
           viewBox="0 0 260 152"
           className="w-full max-w-[260px]"
           role="img"
-          aria-label={`Skala termal menunjukkan ${temperature.toFixed(1)} derajat Celsius, status ${meta.label}`}
+          aria-label={t.gaugeAriaLabel(temperature.toFixed(1), meta.label)}
         >
-          {/* Track latar netral tipis */}
           <path
             d={buildArcPath(MIN_TEMP, MAX_TEMP)}
             fill="none"
@@ -77,7 +80,6 @@ export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
             strokeLinecap="butt"
           />
 
-          {/* 5 Zona warna semantik sinkron F-UI-07 & F-UI-08 */}
           {GAUGE_SEGMENTS.map((seg) => (
             <path
               key={`${seg.from}-${seg.to}`}
@@ -89,7 +91,6 @@ export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
             />
           ))}
 
-          {/* Garis tanda batas terkalibrasi */}
           {GAUGE_TICKS.map((tick) => {
             const theta = tempToTheta(tick);
             const inner = polarToCartesian(RADIUS + 9, theta);
@@ -120,7 +121,6 @@ export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
             );
           })}
 
-          {/* Jarum penunjuk dinamis (MOTION 1: 200ms ease-out state transition) */}
           <g
             style={{
               transform: `rotate(${needleDegrees.toFixed(2)}deg)`,
@@ -145,7 +145,7 @@ export function ThermalGauge({ temperature, level }: ThermalGaugeProps) {
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-3 text-[0.8125rem] tabular-nums">
-        <span className="text-[var(--ink-secondary)]">Posisi saat ini</span>
+        <span className="text-[var(--ink-secondary)]">{t.gaugeCurrentPos}</span>
         <span style={{ color: meta.ink }} className="font-semibold">
           {temperature.toFixed(1)} °C ({meta.rangeLabel})
         </span>

@@ -45,9 +45,37 @@ Palet dibatasi pada permukaan netral terkalibrasi ditambah satu aksen utama (`#1
 | `--ink-primary` | `#0F172A` | Judul, nilai suhu utama, dan teks input aktif | `17.85:1` di atas `#FFFFFF` |
 | `--ink-secondary` | `#475569` | Label field form, deskripsi banner, dan subjudul | `7.07:1` di atas `#F6F7F9` |
 | `--ink-muted` | `#526071` | Satuan input (`°C`, `Wh/m2`), metadata rentang, dan catatan kaki | `5.99:1` di atas `#F6F7F9` |
-| `--accent-primary` | `#1E40AF` | Tombol aksi utama, indikator tab aktif, dan focus ring | `8.72:1` teks `#FFFFFF` di atas `#1E40AF` |
+| `--accent-primary` | `#1E40AF` | Latar tombol aksi utama (dengan teks `#FFFFFF`) | `8.72:1` teks `#FFFFFF` di atas `#1E40AF` |
 | `--accent-hover` | `#1E3A8A` | State hover tombol aksi utama | `> 9.5:1` |
+| `--accent-text` | `#1E40AF` | Teks aksen, ikon aksen, tab/preset aktif, dan focus ring | `8.72:1` di atas `#FFFFFF` |
 | `--accent-tint` | `#EFF6FF` | Sorotan baris/preset yang sedang dipilih | Tinted surface |
+| `--bar-secondary` | `#64748B` | Batang grafik fitur pendukung pada `FeatureImportanceChart` | Elemen grafis `>= 3:1` |
+| `--shadow-hero` | `0 4px 16px rgba(15, 23, 42, 0.06)` | Elevasi halus eksklusif untuk Hero Prediction Card | Depth marker |
+
+### Token Dark Mode (`[data-theme="dark"]`, WCAG AA Terverifikasi)
+
+Tema gelap diaktifkan secara opsional melalui tombol toggle di header dan disimpan di `localStorage` (`seoul_temp_theme`) dengan anti-flash script di `index.html`. Semua pasangan teks/latar terverifikasi `>= 5.71:1`:
+
+| Token | Nilai Hex | Peran | Rasio Kontras Terukur |
+|:---|:---|:---|:---|
+| `--bg-canvas` | `#0B1120` | Latar kanvas gelap utama | Latar dasar |
+| `--surface-primary` | `#111827` | Permukaan panel input, kartu hasil, dan header/footer | Latar panel |
+| `--surface-secondary` | `#1E293B` | Latar grup tab, input metric strip, dan kartu mobile | Latar sekunder |
+| `--border-subtle` | `#334155` | Garis batas kartu, input, dan pemisah tabel | Pemisah struktural |
+| `--ink-primary` | `#F8FAFC` | Teks utama dan angka prediksi | `16.96:1` di atas `#111827` |
+| `--ink-secondary` | `#CBD5E1` | Subjudul, label form, dan deskripsi | `11.95:1` di atas `#111827` |
+| `--ink-muted` | `#94A3B8` | Satuan, metadata waktu, dan caption | `5.71:1` di atas `#1E293B` |
+| `--accent-primary` | `#1D4ED8` | Latar tombol aksi utama (teks `#FFFFFF`) | `6.70:1` |
+| `--accent-text` | `#93C5FD` | Teks aksen, ikon aksen, dan tab/preset aktif di tema gelap | `8.15:1` di atas `#172554` (`--accent-tint`) |
+| `--bar-secondary` | `#94A3B8` | Batang grafik fitur pendukung di mode gelap | Elemen grafis |
+| `--shadow-hero` | `0 4px 18px rgba(2, 6, 23, 0.45)` | Elevasi Hero Card pada latar gelap | Depth marker |
+
+Skala termal 5-level pada `[data-theme="dark"]`:
+- `cool`: Ink `#BAE6FD`, Surface `#0C4A6E`, Border `#0284C7`, Gauge `#38BDF8` (`7.13:1`)
+- `normal`: Ink `#BBF7D0`, Surface `#14532D`, Border `#16A34A`, Gauge `#4ADE80` (`7.52:1`)
+- `warm`: Ink `#FDE68A`, Surface `#78350F`, Border `#D97706`, Gauge `#FBBF24` (`7.28:1`)
+- `advisory`: Ink `#FED7AA`, Surface `#7C2D12`, Border `#EA580C`, Gauge `#FB923C` (`6.92:1`)
+- `warning`: Ink `#FECACA`, Surface `#7F1D1D`, Border `#DC2626`, Gauge `#F87171` (`6.93:1`)
 
 ### Skala Semantik Termal 5-Level (Sinkron `F-UI-07` & `F-UI-08`)
 
@@ -103,7 +131,8 @@ Sesuai `antislop-layoutmobile`, layout tidak boleh hanya memiliki dua state (HP 
 ### State 1: Compact / Mobile (`< 720px`)
 
 - **Struktur:** Aliran 1 kolom vertikal penuh (`padding: 16px`, gap antar blok `16px`).
-- **Header:** Judul aplikasi ringkas + pill status koneksi (`Mode Simulasi FE` atau `API Terhubung`). Tidak ada tautan navigasi mati (`R-24`).
+- **Header:** Judul aplikasi ringkas + toggle bahasa (`ID` | `EN`), toggle tema (`Sun`/`Moon`), switcher sumber (`API Flask` | `Simulasi FE`), dan pill status koneksi (`Mode Simulasi FE` atau `API Terhubung`). Semua tombol kontrol berukuran minimum `44 x 44 px` tanpa tautan navigasi mati (`R-24`).
+- **Compact Intro Strip & UAS Footer:** Di atas `ModeSwitcher` tampil strip pembuka ringkas (~106px di desktop agar form & hasil tetap terlihat di atas lipatan layar) berisi ringkasan fungsi dan 3 metrik UTS nyata (`25 Stasiun AWS`, `89.33% R2`, `0.74 °C MAE`). Di bagian bawah tampil footer identitas proyek UAS SV UGM + tautan repositori GitHub dengan jarak aman `pb-24` di mobile agar tidak tertutupi sticky bottom action bar. Favicon memakai ikon vektor termometer (`public/favicon.svg`).
 - **Navigasi Mode Kerja:** Segmented switch **Prediksi Tunggal** | **Batch CSV** yang melebar penuh (`min-height: 44px`).
 - **Input Panel:** Tombol preset 3 skenario ditumpuk atau dibuat grid responsif dengan `min-height: 44px` dan jarak minimum `8px`. Tab kategori input (`Lokasi`, `Observasi`, `LDAPS`) mempertahankan ukuran sentuh >= `44px` tanpa teks terpotong atau *horizontal overflow*.
 - **Sticky Action Bar Bawah:** Tombol *"Prediksi Suhu Esok Hari"* menempel di bawah layar hanya pada viewport compact agar pengguna tidak perlu menggulir jauh dari tab input mana pun, dengan `padding-bottom: calc(16px + env(safe-area-inset-bottom))` pada wrapper halaman supaya konten terakhir tidak tertutup bar (`antislop-layoutmobile`).

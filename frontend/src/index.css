@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --bg-canvas: #f6f7f9;
   --surface-primary: #ffffff;
   --surface-secondary: #eef1f5;
@@ -12,7 +13,13 @@
 
   --accent-primary: #1e40af;
   --accent-hover: #1e3a8a;
+  --accent-text: #1e40af;
   --accent-tint: #eff6ff;
+
+  --bar-secondary: #64748b;
+  --shadow-hero: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --selection-bg: #dbeafe;
+  --selection-ink: #0f172a;
 
   --thermal-cool-ink: #075985;
   --thermal-cool-bg: #e0f2fe;
@@ -40,6 +47,53 @@
   --thermal-warning-gauge: #dc2626;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-canvas: #0b1120;
+  --surface-primary: #111827;
+  --surface-secondary: #1e293b;
+  --border-subtle: #334155;
+
+  --ink-primary: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --ink-muted: #94a3b8;
+
+  --accent-primary: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-text: #93c5fd;
+  --accent-tint: #172554;
+
+  --bar-secondary: #94a3b8;
+  --shadow-hero: 0 4px 18px rgba(2, 6, 23, 0.45);
+  --selection-bg: #1e3a8a;
+  --selection-ink: #f8fafc;
+
+  --thermal-cool-ink: #bae6fd;
+  --thermal-cool-bg: #0c4a6e;
+  --thermal-cool-border: #0284c7;
+  --thermal-cool-gauge: #38bdf8;
+
+  --thermal-normal-ink: #bbf7d0;
+  --thermal-normal-bg: #14532d;
+  --thermal-normal-border: #16a34a;
+  --thermal-normal-gauge: #4ade80;
+
+  --thermal-warm-ink: #fde68a;
+  --thermal-warm-bg: #78350f;
+  --thermal-warm-border: #d97706;
+  --thermal-warm-gauge: #fbbf24;
+
+  --thermal-advisory-ink: #fed7aa;
+  --thermal-advisory-bg: #7c2d12;
+  --thermal-advisory-border: #ea580c;
+  --thermal-advisory-gauge: #fb923c;
+
+  --thermal-warning-ink: #fecaca;
+  --thermal-warning-bg: #7f1d1d;
+  --thermal-warning-border: #dc2626;
+  --thermal-warning-gauge: #f87171;
+}
+
 @layer base {
   html {
     font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -54,17 +108,17 @@
     min-height: 100dvh;
     background-color: var(--bg-canvas);
     color: var(--ink-primary);
-    caret-color: var(--accent-primary);
+    caret-color: var(--accent-text);
     overflow-x: hidden;
   }
 
   ::selection {
-    background-color: #dbeafe;
-    color: #0f172a;
+    background-color: var(--selection-bg);
+    color: var(--selection-ink);
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent-primary);
+    outline: 2px solid var(--accent-text);
     outline-offset: 2px;
   }
 }

@@ -116,7 +116,7 @@ Catatan: Parameter `station` (1 - 25) digunakan di UI (`F-UI-01`) sebagai pemili
 
 ## 6. Arsitektur Deployment & Tech Stack
 
-* **Frontend (`frontend/`):** React + Vite + Tailwind CSS + TypeScript, memisahkan layer layanan di `src/services/predictionService.ts`.
+* **Frontend (`frontend/`):** React + Vite + Tailwind CSS + TypeScript, memisahkan layer layanan di `src/services/predictionService.ts`, dilengkapi **Compact Intro Strip**, **UAS Footer**, **Favicon SVG** (`public/favicon.svg`), toggle **Light / Dark Mode**, dan toggle dwibahasa **ID / EN**.
 * **Backend & Model Serving (`backend/app.py`):** Python REST API berbasis **Flask** (port default `8000`) yang memuat `rf_model.joblib` sekali saat startup, menyajikan data asli ekstraksi dataset UTS (`backend/data/stations.json` dan `backend/data/presets.json`), serta menyediakan endpoint:
   * `GET /api/health` (kesiapan server & model)
   * `GET /api/model-info` (metadata model & *feature importance* aktual)
@@ -135,7 +135,7 @@ Catatan: Parameter `station` (1 - 25) digunakan di UI (`F-UI-01`) sebagai pemili
 * **Validasi Input & Batch CSV:**
   * Seluruh 21 parameter tunggal divalidasi sebagai angka valid (*finite*) dan memberi peringatan rentang jika keluar dari distribusi model.
   * Batch CSV memeriksa ekstensi `.csv`, batas ukuran `5 MB` / `5000` baris, kelengkapan 21 kolom wajib, serta melaporkan baris yang gagal/mengandung `NaN` per nomor baris tanpa menjatuhkan keseluruhan hasil valid.
-* **Aksesibilitas & Kontras:** Mendukung navigasi keyboard penuh (`Tab`, `Shift+Tab`, `ArrowLeft`/`ArrowRight` pada tab, `Enter`/`Space`) dengan *focus ring* jelas serta rasio kontras minimum **WCAG AA** (`>= 4.5:1`).
+* **Aksesibilitas, Tema & Bahasa:** Mendukung navigasi keyboard penuh (`Tab`, `Shift+Tab`, `ArrowLeft`/`ArrowRight` pada tab, `Enter`/`Space`) dengan *focus ring* jelas, rasio kontras minimum **WCAG AA** pada kedua mode (**Light default** & **Dark toggle**), serta alih bahasa instan **Bahasa Indonesia / English (`ID | EN`)** yang tersimpan di `localStorage`.
 
 ---
 

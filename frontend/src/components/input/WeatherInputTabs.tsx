@@ -1,5 +1,12 @@
 import { useRef } from 'react';
 import { FEATURE_META_LIST, INPUT_TABS } from '../../data/featureMeta';
+import type { Locale } from '../../hooks/useLanguage';
+import {
+  FEATURE_EN_MAP,
+  SUBGROUP_EN_MAP,
+  TAB_TEXT_MAP,
+  UI_STRINGS,
+} from '../../i18n/translations';
 import type { FeatureKey, InputTabId } from '../../types/prediction';
 import type { FeatureFormDraft, FeatureValidationErrors } from '../../utils/validation';
 import { countErrorsByTab } from '../../utils/validation';
@@ -11,6 +18,7 @@ interface WeatherInputTabsProps {
   errors: FeatureValidationErrors;
   warnings: FeatureValidationErrors;
   onChangeField: (key: FeatureKey, value: string) => void;
+  locale: Locale;
 }
 
 export function WeatherInputTabs({
@@ -20,19 +28,22 @@ export function WeatherInputTabs({
   errors,
   warnings,
   onChangeField,
+  locale,
 }: WeatherInputTabsProps) {
+  const t = UI_STRINGS[locale];
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabErrors = countErrorsByTab(errors);
   const currentFields = FEATURE_META_LIST.filter((item) => item.tab === activeTab);
 
-  // Group fields by subgroup preserving declaration order
   const subgroups: Array<{ title: string; fields: typeof currentFields }> = [];
   for (const field of currentFields) {
-    const existing = subgroups.find((group) => group.title === field.subgroup);
+    const subgroupTitle =
+      locale === 'en' ? (SUBGROUP_EN_MAP[field.subgroup] ?? field.subgroup) : field.subgroup;
+    const existing = subgroups.find((group) => group.title === subgroupTitle);
     if (existing) {
       existing.fields.push(field);
     } else {
-      subgroups.push({ title: field.subgroup, fields: [field] });
+      subgroups.push({ title: subgroupTitle, fields: [field] });
     }
   }
 
@@ -54,12 +65,14 @@ export function WeatherInputTabs({
     <div className="space-y-4">
       <div
         role="tablist"
-        aria-label="Kelompok 21 parameter input cuaca"
+        aria-label={t.tabsGroupLabel}
         className="grid grid-cols-3 gap-1 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-1"
       >
         {INPUT_TABS.map((tab, idx) => {
           const isSelected = activeTab === tab.id;
           const errCount = tabErrors[tab.id];
+          const tabText = TAB_TEXT_MAP[tab.id][locale];
+
           return (
             <button
               key={tab.id}
@@ -76,15 +89,15 @@ export function WeatherInputTabs({
               onKeyDown={(e) => handleTabKeyDown(e, idx)}
               className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[6px] px-2 py-2 text-center text-[0.8125rem] font-semibold transition-colors min-[720px]:px-3 min-[720px]:text-[0.875rem] ${
                 isSelected
-                  ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
               }`}
             >
-              <span className="min-[720px]:hidden">{tab.shortLabel}</span>
-              <span className="hidden min-[720px]:inline">{tab.label}</span>
+              <span className="min-[720px]:hidden">{tabText.shortLabel}</span>
+              <span className="hidden min-[720px]:inline">{tabText.label}</span>
               {errCount > 0 && (
                 <span
-                  aria-label={`${errCount} input bermasalah`}
+                  aria-label={t.tabErrorLabel(errCount)}
                   className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--thermal-warning-bg)] px-1.5 text-[0.75rem] font-bold text-[var(--thermal-warning-ink)] tabular-nums"
                 >
                   {errCount}
@@ -112,15 +125,18 @@ export function WeatherInputTabs({
                 const fieldWarning = warnings[meta.key];
                 const inputId = `field-${meta.key.replace(/\s+/g, '-')}`;
                 const msgId = `${inputId}-msg`;
+                const label = locale === 'en' ? FEATURE_EN_MAP[meta.key].label : meta.label;
+                const desc =
+                  locale === 'en' ? FEATURE_EN_MAP[meta.key].description : meta.description;
 
                 return (
                   <div key={meta.key} className="min-w-0 space-y-1">
                     <label
                       htmlFor={inputId}
                       className="block truncate text-[0.8125rem] font-semibold text-[var(--ink-primary)]"
-                      title={meta.description}
+                      title={desc}
                     >
-                      {meta.label}
+                      {label}
                     </label>
                     <div className="relative flex items-center">
                       <input
@@ -158,7 +174,7 @@ export function WeatherInputTabs({
                       </p>
                     ) : (
                       <p className="text-[0.75rem] text-[var(--ink-muted)] tabular-nums">
-                        Rentang latih: {meta.min} - {meta.max} {meta.unit}
+                        {t.trainRangeLabel}: {meta.min} - {meta.max} {meta.unit}
                       </p>
                     )}
                   </div>

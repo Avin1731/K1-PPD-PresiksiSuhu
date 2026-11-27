@@ -1,22 +1,27 @@
 import { Minus, TrendDown, TrendUp } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 
 interface DeltaIndicatorProps {
   presentTmax: number;
   predictedTmax: number;
   deltaT: number;
+  locale: Locale;
 }
 
-export function DeltaIndicator({ presentTmax, predictedTmax, deltaT }: DeltaIndicatorProps) {
+export function DeltaIndicator({
+  presentTmax,
+  predictedTmax,
+  deltaT,
+  locale,
+}: DeltaIndicatorProps) {
+  const t = UI_STRINGS[locale];
   const absDelta = Math.abs(deltaT);
   const isStable = absDelta < 0.2;
   const isWarmer = deltaT >= 0.2;
   const sign = deltaT >= 0 ? '+' : '';
 
-  const headline = isStable
-    ? 'Relatif stabil dibanding hari ini'
-    : isWarmer
-      ? 'Besok diprakirakan lebih terik'
-      : 'Besok diprakirakan lebih sejuk';
+  const headline = isStable ? t.deltaStable : isWarmer ? t.deltaWarmer : t.deltaCooler;
 
   const toneStyle = isStable
     ? {
@@ -38,12 +43,12 @@ export function DeltaIndicator({ presentTmax, predictedTmax, deltaT }: DeltaIndi
 
   return (
     <section
-      aria-label="Perbandingan selisih suhu terhadap hari ini"
+      aria-label={t.deltaTitle}
       className="flex flex-col justify-between rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
     >
       <div>
         <h2 className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">
-          Selisih Suhu vs Hari Ini (Delta T)
+          {t.deltaTitle}
         </h2>
 
         <div className="mt-3 flex items-center gap-3">
@@ -76,17 +81,13 @@ export function DeltaIndicator({ presentTmax, predictedTmax, deltaT }: DeltaIndi
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-[var(--border-subtle)] pt-3">
         <div>
-          <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
-            Hari Ini (Present_Tmax)
-          </dt>
+          <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">{t.deltaToday}</dt>
           <dd className="text-[0.9375rem] font-semibold text-[var(--ink-primary)] tabular-nums">
             {presentTmax.toFixed(1)} °C
           </dd>
         </div>
         <div>
-          <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
-            Esok Hari (Next_Tmax)
-          </dt>
+          <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">{t.deltaTomorrow}</dt>
           <dd className="text-[0.9375rem] font-semibold text-[var(--ink-primary)] tabular-nums">
             {predictedTmax.toFixed(1)} °C
           </dd>

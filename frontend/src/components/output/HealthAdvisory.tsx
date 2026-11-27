@@ -1,19 +1,23 @@
 import { FirstAidKit } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { ThermalLevel } from '../../types/prediction';
 import { getHealthAdvisories } from '../../utils/healthAdvisory';
 import { getThermalMeta } from '../../utils/thermalScale';
 
 interface HealthAdvisoryProps {
   level: ThermalLevel;
+  locale: Locale;
 }
 
-export function HealthAdvisory({ level }: HealthAdvisoryProps) {
-  const meta = getThermalMeta(level);
-  const items = getHealthAdvisories(level);
+export function HealthAdvisory({ level, locale }: HealthAdvisoryProps) {
+  const t = UI_STRINGS[locale];
+  const meta = getThermalMeta(level, locale);
+  const items = getHealthAdvisories(level, locale);
 
   return (
     <section
-      aria-label="Rekomendasi mitigasi kesehatan warga"
+      aria-label={t.advisoryTitle}
       className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
     >
       <div className="flex items-center justify-between gap-2">
@@ -21,11 +25,11 @@ export function HealthAdvisory({ level }: HealthAdvisoryProps) {
           <FirstAidKit
             size={18}
             weight="duotone"
-            className="shrink-0 text-[var(--accent-primary)]"
+            className="shrink-0 text-[var(--accent-text)]"
             aria-hidden="true"
           />
           <h2 className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">
-            Saran Mitigasi Kesehatan Warga
+            {t.advisoryTitle}
           </h2>
         </div>
         <span

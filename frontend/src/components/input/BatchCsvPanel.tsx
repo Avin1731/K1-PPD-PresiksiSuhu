@@ -6,6 +6,8 @@ import {
   UploadSimple,
   WarningCircle,
 } from '@phosphor-icons/react';
+import type { Locale } from '../../hooks/useLanguage';
+import { UI_STRINGS } from '../../i18n/translations';
 import type { BatchPredictResponse, ScenarioPreset } from '../../types/prediction';
 import { downloadBatchResultCsv, downloadTemplateCsv } from '../../utils/csvParser';
 import { getThermalMeta } from '../../utils/thermalScale';
@@ -18,6 +20,7 @@ interface BatchCsvPanelProps {
   result: BatchPredictResponse | null;
   onUploadFile: (file: File) => void;
   onClear: () => void;
+  locale: Locale;
 }
 
 export function BatchCsvPanel({
@@ -28,7 +31,9 @@ export function BatchCsvPanel({
   result,
   onUploadFile,
   onClear,
+  locale,
 }: BatchCsvPanelProps) {
+  const t = UI_STRINGS[locale];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
@@ -42,16 +47,16 @@ export function BatchCsvPanel({
   return (
     <div className="space-y-5">
       <section
-        aria-label="Unggah file CSV prediksi batch"
+        aria-label={t.batchTitle}
         className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
       >
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
           <div>
             <h2 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
-              Prediksi Massal Multi-Hari (Batch CSV)
+              {t.batchTitle}
             </h2>
             <p className="mt-1 max-w-[68ch] text-[0.875rem] text-[var(--ink-secondary)]">
-              Unggah berkas .csv (maksimal 5 MB atau 5.000 baris) yang memuat 21 kolom fitur model eksak termasuk Slope dan Solar radiation (Wh/m2).
+              {t.batchDesc}
             </p>
           </div>
 
@@ -61,7 +66,7 @@ export function BatchCsvPanel({
             className="inline-flex min-h-[44px] items-center gap-2 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-4 text-[0.875rem] font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-secondary)]"
           >
             <DownloadSimple size={17} aria-hidden="true" />
-            Unduh Template CSV
+            {t.batchDownloadTemplate}
           </button>
         </div>
 
@@ -70,7 +75,7 @@ export function BatchCsvPanel({
           type="file"
           accept=".csv,text/csv"
           className="sr-only"
-          aria-label="Pilih berkas CSV"
+          aria-label={t.batchDropPrompt}
           onChange={(e) => {
             handleFileSelected(e.target.files?.[0]);
             e.target.value = '';
@@ -80,7 +85,7 @@ export function BatchCsvPanel({
         <div
           role="button"
           tabIndex={0}
-          aria-label="Area unggah CSV. Tekan Enter atau Space untuk memilih file, atau seret file ke sini."
+          aria-label={t.batchDropPrompt}
           onClick={() => fileInputRef.current?.click()}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -100,22 +105,20 @@ export function BatchCsvPanel({
           }}
           className={`mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[10px] border-2 border-dashed px-4 py-8 text-center transition-colors ${
             isDragging
-              ? 'border-[var(--accent-primary)] bg-[var(--accent-tint)]'
+              ? 'border-[var(--accent-text)] bg-[var(--accent-tint)]'
               : 'border-[var(--border-subtle)] bg-[var(--surface-secondary)] hover:border-[var(--ink-secondary)]'
           }`}
         >
           <UploadSimple
             size={28}
             weight="duotone"
-            className="text-[var(--accent-primary)]"
+            className="text-[var(--accent-text)]"
             aria-hidden="true"
           />
           <p className="mt-2 text-[0.9375rem] font-semibold text-[var(--ink-primary)]">
-            {selectedFileName ? `Berkas dipilih: ${selectedFileName}` : 'Seret file .csv ke area ini atau klik untuk memilih'}
+            {selectedFileName ? t.batchDropSelected(selectedFileName) : t.batchDropPrompt}
           </p>
-          <p className="mt-1 text-[0.8125rem] text-[var(--ink-muted)]">
-            Format UTF-8 dengan 21 fitur model. Kolom opsional Date dan station akan dipakai sebagai label baris.
-          </p>
+          <p className="mt-1 text-[0.8125rem] text-[var(--ink-muted)]">{t.batchDropHint}</p>
         </div>
       </section>
 
@@ -126,7 +129,7 @@ export function BatchCsvPanel({
           className="space-y-3 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
         >
           <p className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">
-            Memproses baris CSV...
+            {t.batchLoading}
           </p>
           <div className="h-16 animate-pulse rounded-[8px] bg-[var(--surface-secondary)]" />
           <div className="h-32 animate-pulse rounded-[8px] bg-[var(--surface-secondary)]" />
@@ -141,11 +144,11 @@ export function BatchCsvPanel({
           <div className="flex items-start gap-3">
             <WarningCircle size={22} weight="bold" className="mt-0.5 shrink-0" aria-hidden="true" />
             <div className="min-w-0 space-y-2">
-              <h3 className="text-[1rem] font-bold">Gagal Memproses Berkas CSV</h3>
+              <h3 className="text-[1rem] font-bold">{t.batchErrorTitle}</h3>
               <p className="text-[0.9375rem]">{error}</p>
               {missingColumns.length > 0 && (
                 <div>
-                  <p className="text-[0.8125rem] font-semibold">Kolom yang hilang:</p>
+                  <p className="text-[0.8125rem] font-semibold">{t.batchMissingCols}</p>
                   <p className="mt-1 text-[0.8125rem]">{missingColumns.join(', ')}</p>
                 </div>
               )}
@@ -157,7 +160,7 @@ export function BatchCsvPanel({
                 }}
                 className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--thermal-warning-border)] bg-[var(--surface-primary)] px-4 text-[0.875rem] font-semibold text-[var(--thermal-warning-ink)] hover:bg-[var(--surface-secondary)]"
               >
-                Bersihkan Error
+                {t.batchClearError}
               </button>
             </div>
           </div>
@@ -166,18 +169,18 @@ export function BatchCsvPanel({
 
       {result && !loading && (
         <section
-          aria-label="Hasil prediksi batch CSV"
+          aria-label={t.batchSummaryTitle}
           className="space-y-4 rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5"
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
             <div className="flex items-center gap-2">
-              <FileCsv size={20} className="text-[var(--accent-primary)]" aria-hidden="true" />
+              <FileCsv size={20} className="text-[var(--accent-text)]" aria-hidden="true" />
               <div>
                 <h3 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
-                  Ringkasan Hasil Batch
+                  {t.batchSummaryTitle}
                 </h3>
                 <p className="text-[0.8125rem] text-[var(--ink-muted)] tabular-nums">
-                  {result.is_mock ? 'Estimasi Simulasi FE' : 'API Live rf_model.joblib'} |{' '}
+                  {result.is_mock ? t.historySourceMock : t.historySourceLive} |{' '}
                   {result.inference_ms.toFixed(2)} ms
                 </p>
               </div>
@@ -190,7 +193,7 @@ export function BatchCsvPanel({
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-[8px] bg-[var(--accent-primary)] px-4 text-[0.875rem] font-semibold text-white transition-colors hover:bg-[var(--accent-hover)]"
               >
                 <DownloadSimple size={17} aria-hidden="true" />
-                Unduh Hasil CSV
+                {t.batchDownloadResult}
               </button>
               <button
                 type="button"
@@ -201,38 +204,48 @@ export function BatchCsvPanel({
                 className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] px-4 text-[0.875rem] font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]"
               >
                 <Trash size={16} aria-hidden="true" />
-                Bersihkan Hasil
+                {t.batchClearResult}
               </button>
             </div>
           </div>
 
           <dl className="grid grid-cols-2 gap-3 min-[720px]:grid-cols-5">
             <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-3">
-              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Diproses / Gagal</dt>
+              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+                {t.batchStatProcessed}
+              </dt>
               <dd className="mt-0.5 text-[1rem] font-bold text-[var(--ink-primary)] tabular-nums">
                 {result.processed_rows} / {result.failed_rows}
               </dd>
             </div>
             <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-3">
-              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Suhu Minimum</dt>
+              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+                {t.batchStatMin}
+              </dt>
               <dd className="mt-0.5 text-[1rem] font-bold text-[var(--ink-primary)] tabular-nums">
                 {result.summary.min_tmax !== null ? `${result.summary.min_tmax.toFixed(2)} °C` : '-'}
               </dd>
             </div>
             <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-3">
-              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Rata-rata Suhu</dt>
+              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+                {t.batchStatAvg}
+              </dt>
               <dd className="mt-0.5 text-[1rem] font-bold text-[var(--ink-primary)] tabular-nums">
                 {result.summary.avg_tmax !== null ? `${result.summary.avg_tmax.toFixed(2)} °C` : '-'}
               </dd>
             </div>
             <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-3">
-              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Suhu Maksimum</dt>
+              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+                {t.batchStatMax}
+              </dt>
               <dd className="mt-0.5 text-[1rem] font-bold text-[var(--ink-primary)] tabular-nums">
                 {result.summary.max_tmax !== null ? `${result.summary.max_tmax.toFixed(2)} °C` : '-'}
               </dd>
             </div>
             <div className="col-span-2 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] p-3 min-[720px]:col-span-1">
-              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">Siaga / Bahaya</dt>
+              <dt className="text-[0.75rem] font-medium text-[var(--ink-muted)]">
+                {t.batchStatRisk}
+              </dt>
               <dd className="mt-0.5 text-[1rem] font-bold text-[var(--ink-primary)] tabular-nums">
                 {result.summary.advisory_count} / {result.summary.warning_count}
               </dd>
@@ -244,17 +257,19 @@ export function BatchCsvPanel({
             <table className="w-full border-collapse text-left text-[0.875rem]">
               <thead>
                 <tr className="border-b border-[var(--border-subtle)] text-[0.8125rem] font-semibold text-[var(--ink-secondary)]">
-                  <th className="py-2.5 pr-3">Baris</th>
-                  <th className="py-2.5 pr-3">Status Termal</th>
+                  <th className="py-2.5 pr-3">{t.batchColRow}</th>
+                  <th className="py-2.5 pr-3">{t.batchColStatus}</th>
                   <th className="py-2.5 pr-3 text-right">Next_Tmax</th>
                   <th className="py-2.5 pr-3 text-right">Present_Tmax</th>
                   <th className="py-2.5 pr-3 text-right">Delta T</th>
-                  <th className="py-2.5">Keterangan</th>
+                  <th className="py-2.5">{t.batchColNote}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-subtle)]">
                 {result.rows.map((row) => {
-                  const meta = row.heatwave_status ? getThermalMeta(row.heatwave_status) : null;
+                  const meta = row.heatwave_status
+                    ? getThermalMeta(row.heatwave_status, locale)
+                    : null;
                   const deltaSign = row.delta_t !== null && row.delta_t >= 0 ? '+' : '';
                   return (
                     <tr key={row.row_index}>
@@ -275,7 +290,7 @@ export function BatchCsvPanel({
                           </span>
                         ) : (
                           <span className="inline-block rounded-[6px] border border-[var(--thermal-warning-border)] bg-[var(--thermal-warning-bg)] px-2 py-0.5 text-[0.75rem] font-semibold text-[var(--thermal-warning-ink)]">
-                            Baris Gagal
+                            {t.batchRowFailed}
                           </span>
                         )}
                       </td>
@@ -289,7 +304,7 @@ export function BatchCsvPanel({
                         {row.delta_t !== null ? `${deltaSign}${row.delta_t.toFixed(2)} °C` : '-'}
                       </td>
                       <td className="py-2.5 text-[0.8125rem] text-[var(--thermal-warning-ink)]">
-                        {row.error ?? 'Valid'}
+                        {row.error ?? t.batchRowValid}
                       </td>
                     </tr>
                   );
@@ -301,7 +316,9 @@ export function BatchCsvPanel({
           {/* Mobile Stacked Row Cards (< 720px) */}
           <div className="space-y-2.5 min-[720px]:hidden">
             {result.rows.map((row) => {
-              const meta = row.heatwave_status ? getThermalMeta(row.heatwave_status) : null;
+              const meta = row.heatwave_status
+                ? getThermalMeta(row.heatwave_status, locale)
+                : null;
               const deltaSign = row.delta_t !== null && row.delta_t >= 0 ? '+' : '';
               return (
                 <div
@@ -325,7 +342,7 @@ export function BatchCsvPanel({
                       </span>
                     ) : (
                       <span className="rounded-[6px] border border-[var(--thermal-warning-border)] bg-[var(--thermal-warning-bg)] px-2 py-0.5 text-[0.75rem] font-semibold text-[var(--thermal-warning-ink)]">
-                        Baris Gagal
+                        {t.batchRowFailed}
                       </span>
                     )}
                   </div>
@@ -340,7 +357,7 @@ export function BatchCsvPanel({
                         Next_Tmax: {row.predicted_tmax?.toFixed(2)} °C
                       </span>
                       <span className="text-[var(--ink-secondary)]">
-                        Hari Ini: {row.present_tmax?.toFixed(1)} °C
+                        {t.historyTodayShort}: {row.present_tmax?.toFixed(1)} °C
                       </span>
                       <span className="text-[var(--ink-secondary)]">
                         Delta: {deltaSign}
