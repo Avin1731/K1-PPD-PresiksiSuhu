@@ -47,7 +47,6 @@ PrediksiSuhu/
 ├── design.md                       # Sistem desain UI, skala termal 5-level, Dark Mode & responsivitas
 ├── plan.md                         # Rencana implementasi bertahap Frontend
 ├── README.md                       # Panduan umum monorepo
-├── rf_model.joblib                 # Model Random Forest terlatih (~49.5 MB)
 │
 ├── frontend/                       # Aplikasi FE aktif (React + Vite + Tailwind + TypeScript)
 │   ├── .env.example
@@ -67,9 +66,11 @@ PrediksiSuhu/
 └── backend/                        # Server BE Flask + data asli dataset UTS
     ├── requirements.txt
     ├── app.py                      # Server API (/api/health, /api/model-info, /api/stations, /api/presets, /api/predict, /api/predict/batch)
-    └── data/
-        ├── stations.json           # 25 stasiun pengamatan cuaca asli (lat, lon, DEM, Slope)
-        └── presets.json            # 3 skenario nyata teruji terhadap rf_model.joblib
+    ├── data/
+    │   ├── stations.json           # 25 stasiun pengamatan cuaca asli (lat, lon, DEM, Slope)
+    │   └── presets.json            # 3 skenario nyata teruji terhadap rf_model.joblib
+    └── models/
+        └── rf_model.joblib         # Model Random Forest terlatih (~49.5 MB)
 ```
 
 ---
@@ -116,7 +117,7 @@ Konfigurasi `.env` frontend:
 
 ### 2. Backend (`backend/`, sudah siap dijalankan)
 
-Server backend berbasis **Flask** tersedia di `backend/app.py` (port default `8000`) dan otomatis memuat `rf_model.joblib`, `backend/data/stations.json` (25 stasiun asli), serta `backend/data/presets.json` (3 skenario nyata).
+Server backend berbasis **Flask** tersedia di `backend/app.py` (port default `8000`) dan otomatis memuat `backend/models/rf_model.joblib`, `backend/data/stations.json` (25 stasiun asli), serta `backend/data/presets.json` (3 skenario nyata).
 
 ```bash
 pip install -r backend/requirements.txt
