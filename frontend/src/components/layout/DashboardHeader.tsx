@@ -1,4 +1,12 @@
-import { ArrowsClockwise, CheckCircle, Thermometer, WarningCircle } from '@phosphor-icons/react';
+import {
+  ArrowsClockwise,
+  CheckCircle,
+  Moon,
+  Sun,
+  Thermometer,
+  WarningCircle,
+} from '@phosphor-icons/react';
+import type { ThemeMode } from '../../hooks/useTheme';
 
 interface DashboardHeaderProps {
   serviceMode: 'live' | 'mock';
@@ -6,6 +14,8 @@ interface DashboardHeaderProps {
   checkingHealth: boolean;
   healthError: string | null;
   onRefreshHealth: () => void;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
 }
 
 export function DashboardHeader({
@@ -14,6 +24,8 @@ export function DashboardHeader({
   checkingHealth,
   healthError,
   onRefreshHealth,
+  theme,
+  onToggleTheme,
 }: DashboardHeaderProps) {
   return (
     <header className="border-b border-[var(--border-subtle)] bg-[var(--surface-primary)]">
@@ -22,7 +34,7 @@ export function DashboardHeader({
           <Thermometer
             size={24}
             weight="duotone"
-            className="shrink-0 text-[var(--accent-primary)]"
+            className="shrink-0 text-[var(--accent-text)]"
             aria-hidden="true"
           />
           <h1 className="truncate text-[1.1875rem] font-bold leading-tight tracking-tight min-[720px]:text-[1.375rem]">
@@ -31,6 +43,20 @@ export function DashboardHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            aria-label={theme === 'dark' ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+            title={theme === 'dark' ? 'Beralih ke mode terang' : 'Beralih ke mode gelap'}
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-2.5 text-[var(--ink-primary)] transition-colors hover:border-[var(--ink-secondary)]"
+          >
+            {theme === 'dark' ? (
+              <Sun size={18} weight="regular" aria-hidden="true" />
+            ) : (
+              <Moon size={18} weight="regular" aria-hidden="true" />
+            )}
+          </button>
+
           <div
             role="group"
             aria-label="Sumber layanan prediksi"
@@ -41,7 +67,7 @@ export function DashboardHeader({
               onClick={() => onChangeServiceMode('live')}
               className={`min-h-[44px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
                 serviceMode === 'live'
-                  ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
               }`}
             >
@@ -52,7 +78,7 @@ export function DashboardHeader({
               onClick={() => onChangeServiceMode('mock')}
               className={`min-h-[44px] rounded-[6px] px-3 text-[0.8125rem] font-semibold transition-colors ${
                 serviceMode === 'mock'
-                  ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
               }`}
             >

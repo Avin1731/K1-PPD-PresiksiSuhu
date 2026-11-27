@@ -60,7 +60,7 @@ export function FeatureImportanceChart({
                   </span>
                   <span
                     className={`min-w-[48px] text-right font-bold ${
-                      isTopDriver ? 'text-[var(--accent-primary)]' : 'text-[var(--ink-primary)]'
+                      isTopDriver ? 'text-[var(--accent-text)]' : 'text-[var(--ink-primary)]'
                     }`}
                   >
                     {pct.toFixed(1)}%
@@ -73,7 +73,7 @@ export function FeatureImportanceChart({
                   className="h-full rounded-[4px] transition-all duration-200"
                   style={{
                     width: `${barWidth}%`,
-                    backgroundColor: isTopDriver ? 'var(--accent-primary)' : '#64748B',
+                    backgroundColor: isTopDriver ? 'var(--accent-text)' : 'var(--bar-secondary)',
                   }}
                 />
               </div>

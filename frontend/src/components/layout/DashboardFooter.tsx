@@ -27,7 +27,7 @@ export function DashboardFooter({ isSingleMode }: DashboardFooterProps) {
             href="https://github.com/Avin1731/K1-PPD-PresiksiSuhu"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-3 font-semibold text-[var(--accent-primary)] transition-colors hover:bg-[var(--accent-tint)]"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] px-3 font-semibold text-[var(--accent-text)] transition-colors hover:bg-[var(--accent-tint)]"
           >
             Repositori GitHub
             <ArrowSquareOut size={16} aria-hidden="true" />

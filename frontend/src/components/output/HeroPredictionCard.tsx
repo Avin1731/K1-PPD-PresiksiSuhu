@@ -14,7 +14,7 @@ export function HeroPredictionCard({ prediction, stationLabel }: HeroPredictionC
     <section
       aria-label="Hasil prediksi suhu maksimum esok hari"
       className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-5 min-[720px]:p-6"
-      style={{ boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}
+      style={{ boxShadow: 'var(--shadow-hero)' }}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">

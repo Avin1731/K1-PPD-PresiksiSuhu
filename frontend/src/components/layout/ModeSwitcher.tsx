@@ -20,7 +20,7 @@ export function ModeSwitcher({ mode, onChangeMode }: ModeSwitcherProps) {
         aria-pressed={mode === 'single'}
         className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[6px] px-4 text-[0.875rem] font-semibold transition-colors ${
           mode === 'single'
-            ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+            ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
             : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
         }`}
       >
@@ -33,7 +33,7 @@ export function ModeSwitcher({ mode, onChangeMode }: ModeSwitcherProps) {
         aria-pressed={mode === 'batch'}
         className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[6px] px-4 text-[0.875rem] font-semibold transition-colors ${
           mode === 'batch'
-            ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+            ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
             : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
         }`}
       >

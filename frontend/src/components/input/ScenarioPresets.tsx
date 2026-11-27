@@ -41,7 +41,7 @@ export function ScenarioPresets({
               title={preset.description}
               className={`flex min-h-[46px] items-center gap-2 rounded-[8px] border px-3 py-2 text-left text-[0.8125rem] font-semibold leading-snug transition-colors ${
                 isActive
-                  ? 'border-[var(--accent-primary)] bg-[var(--accent-tint)] text-[var(--accent-primary)]'
+                  ? 'border-[var(--accent-text)] bg-[var(--accent-tint)] text-[var(--accent-text)]'
                   : 'border-[var(--border-subtle)] bg-[var(--surface-primary)] text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
               }`}
             >

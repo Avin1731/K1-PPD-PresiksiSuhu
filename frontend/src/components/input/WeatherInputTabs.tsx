@@ -76,7 +76,7 @@ export function WeatherInputTabs({
               onKeyDown={(e) => handleTabKeyDown(e, idx)}
               className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-[6px] px-2 py-2 text-center text-[0.8125rem] font-semibold transition-colors min-[720px]:px-3 min-[720px]:text-[0.875rem] ${
                 isSelected
-                  ? 'bg-[var(--surface-primary)] text-[var(--accent-primary)] shadow-xs'
+                  ? 'bg-[var(--surface-primary)] text-[var(--accent-text)] shadow-xs'
                   : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
               }`}
             >

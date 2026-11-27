@@ -100,14 +100,14 @@ export function BatchCsvPanel({
           }}
           className={`mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[10px] border-2 border-dashed px-4 py-8 text-center transition-colors ${
             isDragging
-              ? 'border-[var(--accent-primary)] bg-[var(--accent-tint)]'
+              ? 'border-[var(--accent-text)] bg-[var(--accent-tint)]'
               : 'border-[var(--border-subtle)] bg-[var(--surface-secondary)] hover:border-[var(--ink-secondary)]'
           }`}
         >
           <UploadSimple
             size={28}
             weight="duotone"
-            className="text-[var(--accent-primary)]"
+            className="text-[var(--accent-text)]"
             aria-hidden="true"
           />
           <p className="mt-2 text-[0.9375rem] font-semibold text-[var(--ink-primary)]">
@@ -171,7 +171,7 @@ export function BatchCsvPanel({
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
             <div className="flex items-center gap-2">
-              <FileCsv size={20} className="text-[var(--accent-primary)]" aria-hidden="true" />
+              <FileCsv size={20} className="text-[var(--accent-text)]" aria-hidden="true" />
               <div>
                 <h3 className="text-[1.0625rem] font-semibold text-[var(--ink-primary)]">
                   Ringkasan Hasil Batch

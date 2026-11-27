@@ -21,7 +21,7 @@ export function HealthAdvisory({ level }: HealthAdvisoryProps) {
           <FirstAidKit
             size={18}
             weight="duotone"
-            className="shrink-0 text-[var(--accent-primary)]"
+            className="shrink-0 text-[var(--accent-text)]"
             aria-hidden="true"
           />
           <h2 className="text-[0.875rem] font-semibold text-[var(--ink-secondary)]">

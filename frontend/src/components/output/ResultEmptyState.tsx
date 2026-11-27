@@ -8,7 +8,7 @@ export function ResultEmptyState() {
       className="rounded-[12px] border border-[var(--border-subtle)] bg-[var(--surface-primary)] p-6"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] text-[var(--accent-primary)]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[var(--border-subtle)] bg-[var(--surface-secondary)] text-[var(--accent-text)]">
           <Thermometer size={20} weight="duotone" aria-hidden="true" />
         </div>
         <div>

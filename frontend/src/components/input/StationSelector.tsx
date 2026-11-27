@@ -24,7 +24,7 @@ export function StationSelector({
           htmlFor="station-selector"
           className="inline-flex items-center gap-1.5 text-[0.875rem] font-semibold text-[var(--ink-primary)]"
         >
-          <MapPin size={16} className="text-[var(--accent-primary)]" aria-hidden="true" />
+          <MapPin size={16} className="text-[var(--accent-text)]" aria-hidden="true" />
           Stasiun Pengamatan Cuaca Seoul (1 - 25)
         </label>
         {isManualGeoOverride && (

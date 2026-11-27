@@ -22,6 +22,7 @@ import { SessionHistoryTable } from './components/output/SessionHistoryTable';
 import { ThermalGauge } from './components/output/ThermalGauge';
 import { usePrediction } from './hooks/usePrediction';
 import { useSessionHistory } from './hooks/useSessionHistory';
+import { useTheme } from './hooks/useTheme';
 import {
   MODEL_FEATURE_ORDER,
   type FeatureKey,
@@ -65,6 +66,7 @@ export default function App() {
   } = usePrediction();
 
   const { history, addEntry, clearHistory } = useSessionHistory();
+  const { theme, toggleTheme } = useTheme();
 
   const initialPreset = SCENARIO_PRESETS[0];
 
@@ -203,6 +205,8 @@ export default function App() {
         checkingHealth={checkingHealth}
         healthError={healthError}
         onRefreshHealth={() => void refreshHealth(serviceMode)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <main className="mx-auto w-full max-w-[1360px] flex-1 space-y-5 px-4 py-5 min-[720px]:px-6 min-[720px]:py-6">
